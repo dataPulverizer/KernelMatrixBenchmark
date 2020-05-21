@@ -21,11 +21,15 @@ While preparing the code for this article, the Chapel, D, and Julia communities 
 
 ### Implementations 
 
-Efforts were made to avoid non standard libraries while implementing these kernel functions. There are a number of reasons for this, firstly it’s easy for a reader to install the language, copy the code and run it locally if they don’t have to install any external languages. Secondly since these languages are relatively new, packages outside the standard libraries can go extinct so avoiding external libraries keeps this information relevant – you can come back at anytime and run the code in the same languages and everything should still work, thirdly it is more transparent and shows how the language works.
+Efforts were made to avoid non standard libraries while implementing these kernel functions. The reasons for this are:
 
-Following are code snippets showing these in the different languages and the optimized versions of the code were developed with help from each of the programming communities.
+* Making it easy for a reader after installing the language to copy and run the code. Having to install external libraries can be a bit of a "faff".
+* Packages outside standard libraries can go extinct so avoiding external libraries keeps the article and code relevant.
+* It's completely transparent and shows how each language works.
 
-Chapel uses a `forall` loop which parallelizes the code over threads. Also C pointers to each vector is used rather than the default array notation and `guided` iteration over the indexes:
+#### Chapel
+
+Chapel uses a `forall` loop to parallelizes the code over threads. Also C pointers to each item is used rather than the default array notation and `guided` iteration over the indexes:
 
 ```
 //Chapel
@@ -48,7 +52,11 @@ proc calculateKernelMatrix(K, data: [?D] ?T)
 }
 ```
 
-D uses a task pool of threads to parallelize the code. The D code underwent the least amount of change for performance optimization, a lot of the benefit came from the compiler (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
+Chapel code was the most difficult to optimise for performance and required the most in terms of code changes.
+
+#### D
+
+D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the benefit came from the compiler (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
 
 ```
 auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
@@ -68,7 +76,13 @@ auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
   return mat;
 }
 ```
-The Julia code uses `@threads` macro for parallelising the code and `@views` macro for using views of the data. The `Symmetric` type was used to save the small bit of extra work needed for allocating to both sides of the matrix.
+
+#### Julia
+
+The Julia code uses `@threads` macro for parallelising the code and `@views` macro for referencing arrays. One confusing thing about Julia's arrays is their reference status. Sometimes as in this case arrays will behave like value objects and they have to be referenced by using the `@views` macro otherwise they generate copies, at other times they behave like reference objects, for example passing them into a function. It can be a little tricky dealing with this because you don't always know what set of operations will generate a copy, but where this occurs `@views` provides a good solution.
+
+The `Symmetric` type saves the small bit of extra work needed for allocating to both sides of the matrix.
+
 ```
 //Julia
 function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKernel,T <: AbstractFloat}
@@ -82,9 +96,8 @@ function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKe
   return Symmetric(mat, :L)
 end
 ```
-One confusing thing about Julia's arrays is their reference status. Sometimes as in this case arrays will behave like value objects and they have to be referenced by using the `@views` macro otherwise they generate copies, at other times they behave like reference objects, for example passing them into a function. It can be a little tricky dealing with this because you don't always know what set of operations will generate a copy, but where this occurs `@views` provides a good solution.
 
-Also the `@bounds` and `@simd` macros in the kernel functions were used to turn bounds checking off and apply SIMD optimization to the calculations:
+The `@bounds` and `@simd` macros in the kernel functions were used to turn bounds checking off and apply SIMD optimization to the calculations:
 
 ```
 struct DotProduct <: AbstractKernel end
