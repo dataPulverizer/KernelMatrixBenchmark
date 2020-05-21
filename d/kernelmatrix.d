@@ -10,7 +10,7 @@ import std.datetime.stopwatch: AutoStart, StopWatch;
   http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/
 */
 interface AbstractKernel(T){
-  T kernel(T[] x, T[] y) const;
+  T opCall(T[] x, T[] y) const;
 }
 
 class DotProduct(T): AbstractKernel!(T)
@@ -18,7 +18,8 @@ class DotProduct(T): AbstractKernel!(T)
   @nogc:
   public:
   //pragma(inline, true):
-  /*@fastmath*/ T kernel(T[] x, T[] y) const
+  //@fastmath
+  T opCall(T[] x, T[] y) const
   {
     //assert(x.length == y.length, "x and y are not the same length.");
     T ret = 0;
@@ -36,7 +37,7 @@ class Polynomial(T): AbstractKernel!(T)
   private:
   T d;
   public:
-  T kernel(T[] x, T[] y) const
+  T opCall(T[] x, T[] y) const
   {
     //assert(x.length == y.length, "x and y are not the same length.");
     T ret = 0;
@@ -48,7 +49,6 @@ class Polynomial(T): AbstractKernel!(T)
   }
 }
 
-
 class Gaussian(T): AbstractKernel!(T)
 {
   @nogc:
@@ -59,7 +59,7 @@ class Gaussian(T): AbstractKernel!(T)
   {
     gamma = _gamma;
   }
-  T kernel(T[] x, T[] y) const
+  T opCall(T[] x, T[] y) const
   {
     //assert(x.length == y.length, "x and y are not the same length.");
     T ret = 0;
@@ -83,7 +83,7 @@ class Laplace(T): AbstractKernel!(T)
   {
     sigma = _sigma;
   }
-  T kernel(T[] x, T[] y) const
+  T opCall(T[] x, T[] y) const
   {
     //assert(x.length == y.length, "x and y are not the same length.");
     T ret = 0;
@@ -109,7 +109,7 @@ class HyperbolicTan(T): AbstractKernel!(T)
   {
     alpha =  _alpha; c = _c;
   }
-  T kernel(T[] x, T[] y) const
+  T opCall(T[] x, T[] y) const
   {
     //assert(x.length == y.length, "x and y are not the same length.");
     T ret = 0;
@@ -134,7 +134,7 @@ auto calculateKernelMatrix(K, T)(K!(T) Kernel, Matrix!(T) data)
     //for(long i = j; i < n; ++i)
     foreach(long i; j..n)
     {
-      mat[i, j] = Kernel.kernel(data.refColumnSelect(i).array, arrj);
+      mat[i, j] = Kernel(data.refColumnSelect(i).array, arrj);
       mat[j, i] = mat[i, j];
     }
   }
