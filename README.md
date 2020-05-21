@@ -82,7 +82,7 @@ function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKe
   return Symmetric(mat, :L)
 end
 ```
-One confusing thing about Julia's arrays is their reference status. Sometimes as in this case arrays will behave like value objects and they have to be referenced by using the `@views` macros otherwise they generate copies, at other times they behave like reference objects, for example when you pass them into a function. It can be a little tricky dealing with this because you don't always know where copies are generated.
+One confusing thing about Julia's arrays is their reference status. Sometimes as in this case arrays will behave like value objects and they have to be referenced by using the `@views` macros otherwise they generate copies, at other times they behave like reference objects, for example when you pass them into a function. It can be a little tricky dealing with this because you don't always know what set of operations will generate a copy, but where this occurs `@views` provides a good solution.
 
 Also the `@bounds` and `@simd` macros in the kernel functions were used to turn bounds checking off and apply SIMD optimization to the calculations:
 
