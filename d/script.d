@@ -1,5 +1,6 @@
 import arrays;
 import kernelmatrix;
+import std.algorithm : sum;
 import std.stdio: writeln;
 import std.datetime.stopwatch: AutoStart, StopWatch;
 
@@ -16,15 +17,15 @@ auto bench(alias K, T)(K!T Kernel, long[] n, bool verbose = true)
   {
     double[3] _times;
     auto data = createRandomMatrix!T(784L, n[i]);
-    foreach(j; 0..3)
+    foreach(ref t; _times[])
     {
       sw.start();
       auto mat = calculateKernelMatrix!(K!T, T)(Kernel, data);
       sw.stop();
-      _times[j] = cast(double)sw.peek.total!"usecs"/1000_000;
+      t = sw.peek.total!"usecs"/1000_000.0;
       sw.reset();
     }
-    times[i] = (_times[0] + _times[1] + _times[2])/3;
+    times[i] = sum(_times[])/3.0;
     if(verbose)
       writeln("Average time for n = ", n[i], ", ", times[i], " seconds.");
   }
