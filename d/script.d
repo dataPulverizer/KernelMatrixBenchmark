@@ -26,7 +26,10 @@ auto bench(K, T)(K!(T) Kernel, long[] n, bool verbose = true)
     }
     times[i] = (_times[0] + _times[1] + _times[2])/3;
     if(verbose)
+    {
       writeln("Average time for n = ", n[i], ", ", times[i], " seconds.");
+      writeln("Detailed times: ", _times);
+    }
   }
   return times;
 }
