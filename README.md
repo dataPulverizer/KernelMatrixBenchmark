@@ -12,6 +12,6 @@ We'll look at the times for the dot kernel only, but we don't allow use of BLAS 
 
 <style>
 .plot {
-   width: 40vw;
+   width: 30vw;
 }
 </style>
