@@ -1,5 +1,5 @@
 /*
-  This module contains implementations for vectors and matrices
+  This module contains implementations for vectors and matrices an altered version from my glmsolverd package
 */
 
 module arrays;
