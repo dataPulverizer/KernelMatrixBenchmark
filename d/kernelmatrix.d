@@ -1,11 +1,9 @@
-//import io;
 import arrays;
 import std.parallelism;
 import std.range : iota;
 import std.math: exp, sqrt, tanh;
 import std.stdio: writeln;
 import std.datetime.stopwatch: AutoStart, StopWatch;
-/*import ldc.attributes : fastmath;*/
 
 /*
   Reference for Kernel functions
@@ -142,24 +140,6 @@ auto calculateKernelMatrix(K, T)(K!(T) Kernel, Matrix!(T) data)
   }
   return mat;
 }
-
-
-//void main()
-//{
-//  //dmd kernelmatrix.d io.d arrays.d && ./kernelmatrix
-//  auto _data = read_idx!(ubyte)("../data/t10k-images.idx3-ubyte");
-//  auto data = new Matrix!(float)(
-//    map!(x => cast(float)x)(_data.array), _data.size
-//  );
-//  auto k = new DotProduct!(float)();
-//  auto sw = StopWatch(AutoStart.no);
-//  sw.start();
-//  auto mat = calculateKernelMatrix!(float)(k, data);
-//  sw.stop();
-//  writeln("Time taken (s): ", cast(float)sw.peek.total!"msecs"/1000);
-//  //writeln("First 10 by 10 submatrix: ", mat.printSubArray([0, 5], [0, 5]));
-//}
-
 
 
 
