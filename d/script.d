@@ -6,10 +6,6 @@ import std.datetime.stopwatch: AutoStart, StopWatch;
 /**
   To compile
   ldc2 script.d kernelmatrix.d arrays.d -O5 --boundscheck=off --ffast-math && ./script
-  
-  Using:
-  /usr/bin/time -v ./script
-  to execute will display performance information
 */
 
 auto bench(K, T)(K!(T) Kernel, long[] n, bool verbose = true)
