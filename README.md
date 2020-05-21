@@ -17,6 +17,6 @@ The plot of the benchmarks are shown below:
 
 <style>
 .plot {
-   width: 50vw;
+   width: 40vw;
 }
 </style>
