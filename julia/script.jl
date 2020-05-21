@@ -17,6 +17,7 @@ function bench(::Type{T}, Kernel::K, n::Array{Int64, 1}, verbose::Bool = true) w
     times[i] = (_times[1] + _times[2] + _times[3])/3
     if verbose
       println("Average time for n = ", n[i], ", ", times[i], " seconds.")
+      println("Detailed times: ", _times);
     end
   end
   return times
