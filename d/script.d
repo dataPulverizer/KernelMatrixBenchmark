@@ -9,7 +9,7 @@ import std.datetime.stopwatch: AutoStart, StopWatch;
   ldc2 script.d kernelmatrix.d arrays.d -O5 --boundscheck=off --ffast-math && ./script
 */
 
-auto bench(alias K, T)(K!T Kernel, long[] n, bool verbose = true)
+auto bench(alias K, T)(K!T kernel, long[] n, bool verbose = true)
 {
   auto times = new double[n.length];
   auto sw = StopWatch(AutoStart.no);
@@ -20,7 +20,7 @@ auto bench(alias K, T)(K!T Kernel, long[] n, bool verbose = true)
     foreach(ref t; _times[])
     {
       sw.start();
-      auto mat = calculateKernelMatrix!(K!T, T)(Kernel, data);
+      auto mat = calculateKernelMatrix!(K!T, T)(kernel, data);
       sw.stop();
       t = sw.peek.total!"usecs"/1000_000.0;
       sw.reset();
@@ -35,8 +35,8 @@ auto bench(alias K, T)(K!T Kernel, long[] n, bool verbose = true)
 //bench: [0.009412, 0.271136, 1.43589, 11.267, 31.0559]
 void main()
 {
-  auto Kernel = new DotProduct!float();
-  writeln("bench: ", bench(Kernel, [1000L, 5000L, 
+  auto kernel = new DotProduct!float();
+  writeln("bench: ", bench(kernel, [1000L, 5000L, 
       10_000L, 20_000L, 30_000L]));
 }
 

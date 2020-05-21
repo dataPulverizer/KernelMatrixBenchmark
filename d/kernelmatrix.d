@@ -123,7 +123,7 @@ class HyperbolicTan(T): AbstractKernel!(T)
   }
 }
 
-auto calculateKernelMatrix(K, T)(K!(T) Kernel, Matrix!(T) data)
+auto calculateKernelMatrix(K, T)(K!(T) kernel, Matrix!(T) data)
 {
   long n = data.ncol;
   auto mat = Matrix!(T)(n, n);
@@ -134,7 +134,7 @@ auto calculateKernelMatrix(K, T)(K!(T) Kernel, Matrix!(T) data)
     //for(long i = j; i < n; ++i)
     foreach(long i; j..n)
     {
-      mat[i, j] = Kernel(data.refColumnSelect(i).array, arrj);
+      mat[i, j] = kernel(data.refColumnSelect(i).array, arrj);
       mat[j, i] = mat[i, j];
     }
   }
