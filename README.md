@@ -7,13 +7,8 @@ The original problem was looking at generating kernel matrices for the test MNIS
 
 We'll look at the times for the dot kernel only, but we don't allow use of BLAS or anything that removes the generalization of of the functional form ... meaning that the calculation is performed in the same way as it would be for any other kernel function. There is a lovely article for kernels located [here](http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/).
 
-## The benchmarks
-
-The plot of the benchmarks are shown below:
-
 ## Language Benchmarks for Kernel Matrix Calculation
 <img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg">
-
 
 <style>
 .plot {
