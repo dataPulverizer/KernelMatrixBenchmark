@@ -14,59 +14,34 @@ import std.stdio: writeln;
 import std.random;
 
 /********************************************* Printer Utility Functions *********************************************/
-long getMaxLength(T)(const(T[]) v)
-if(isIntegral!T)
-{
-  long x = 0;
-  foreach(el; v)
-    x = max(x, cast(long)to!string(el).length);
-  return x;
-}
-
-long[] getMaxLength(T)(const(T[]) v)
+auto getRange(T)(const(T[]) data)
 if(isFloatingPoint!T)
 {
-  long[] x = [0, 0];
-  real intpart, frac;
-  foreach(el; v)
+  real[2] range = [cast(real)data[0], cast(real)data[0]];
+  foreach(el; data)
   {
-    frac = modf(cast(real)el, intpart);
-    x[0] = max(x[0], cast(long)to!string(intpart).length);
-    x[1] = max(x[1], cast(long)to!string(frac).length);
+    range[0] = min(range[0], el);
+    range[1] = max(range[1], el);
   }
-  return x;
+  return range;
 }
-
-string floatFormat(long[] mlen, long dp = 6, long dig = 7, long gap = 2)
+string getFormat(real[] range, long maxLength = 8, long gap = 2)
 {
-  string dform = "";
-  long tot = mlen[0] + mlen[1];
-
-  if((tot > dig) && (mlen[0] > 1))
+  writeln("range: ", range);
+  string form = "";
+  if((range[0] > 0.01) & (range[1] < 1000_000))
   {
-    dform = "%" ~ to!string(dp + 4*gap) ~ "." ~ to!string(dp) ~ "e";
-  } else if(tot > dig){
-    dform = "%" ~ to!string(dp + 2*gap) ~ "." ~ to!string(dp) ~ "f";
-  } else {
-    dform = "%" ~ to!string(mlen[0] + mlen[1] + gap) ~ "." ~ to!string(mlen[1]) ~ "f";
+    form = "%" ~ to!(string)(gap + 2 + maxLength) ~ "." ~ to!(string)(maxLength) ~ "g";
+  }else if((range[0] < 0.0001) | (range[1] > 1000_000))
+  {
+    form = "%" ~ to!(string)(gap + 1 + maxLength) ~ "." ~ to!(string)(4) ~ "g";
   }
-
-  return dform;
+  return form;
 }
-
-/* Function to pad to length */
-string pad(string num, long len)
-{
-  while(len > num.length)
-    num ~= " ";
-  return num;
-}
-
-
 /********************************************* Matrix Class *********************************************/
 
 /*
-  Create an array in an "unsafe" but blazingly fast way.
+  Faster Array Creation
 */
 auto newArray(T)(long n)
 {
@@ -77,7 +52,7 @@ auto newArray(T)(long n)
 }
 
 /*
-  Matrices and Vectors will be column major
+  Matrix will be column major
 */
 mixin template MatrixGubbings(T)
 {
@@ -96,7 +71,6 @@ mixin template MatrixGubbings(T)
   {
     long _len = n*m;
     data = newArray!(T)(_len);
-    //data = new T[_len];
     dim = [n, m];
   }
   this(T[] _data, long[] _dim)
@@ -111,7 +85,7 @@ mixin template MatrixGubbings(T)
     data = mat.data.dup;
     dim = mat.dim.dup;
   }
-  @property Matrix!(T) dup()
+  @property Matrix!(T) dup() const
   {
     return Matrix!(T)(data.dup, dim.dup);
   }
@@ -195,11 +169,11 @@ mixin template MatrixGubbings(T)
       }
     }else static assert(0, "Operator \"" ~ op ~ "\" not implemented");
   }
-  @property long nrow()
+  @property long nrow() const
   {
     return dim[0];
   }
-  @property long ncol()
+  @property long ncol() const
   {
     return dim[1];
   }
@@ -207,11 +181,11 @@ mixin template MatrixGubbings(T)
   {
     return data;
   }
-  @property long len()
+  @property long len() const
   {
     return data.length;
   }
-  @property long length()
+  @property long length() const
   {
     return data.length;
   }
@@ -220,7 +194,7 @@ mixin template MatrixGubbings(T)
     return dim.dup;
   }
   /* Returns transposed matrix (duplicated) */
-  Matrix!(T) t()
+  Matrix!(T) t() const
   {
     auto _data = data.dup;
     long[] _dim = new long[2];
@@ -247,12 +221,7 @@ mixin template MatrixGubbings(T)
     }
     return Matrix!(T)(_data, _dim);
   }
-  /* Cast to Column Vector */
-  ColumnVector!(T) opCast(V: ColumnVector!(T))() {
-    assert(ncol == 1, "The number of columns in the matrix 
-         is not == 1 and so can not be converted to a matrix.");
-    return new ColumnVector!(T)(data);
-  }
+  
   /* Appends Vector to the END of the matrix */
   void appendColumn(T[] rhs)
   {
@@ -260,11 +229,6 @@ mixin template MatrixGubbings(T)
       "Vector is not of the same length as number of rows.");
     data ~= rhs;
     dim[1] += 1;
-    return;
-  }
-  void appendColumn(Vector!(T) rhs)
-  {
-    appendColumn(rhs.array);
     return;
   }
   void appendColumn(Matrix!(T) rhs)
@@ -276,7 +240,6 @@ mixin template MatrixGubbings(T)
   void appendColumn(T _rhs)
   {
     auto rhs = newArray!(T)(nrow);
-    //auto rhs = new T[nrow];
     rhs[] = _rhs;
     appendColumn(rhs);
   }
@@ -289,11 +252,6 @@ mixin template MatrixGubbings(T)
     dim[1] += 1;
     return;
   }
-  void prependColumn(Vector!(T) rhs)
-  {
-    prependColumn(rhs.array);
-    return;
-  }
   void prependColumn(Matrix!(T) rhs)
   {
     assert((rhs.nrow == 1) | (rhs.ncol == 1), 
@@ -303,7 +261,6 @@ mixin template MatrixGubbings(T)
   void prependColumn(T _rhs)
   {
     auto rhs = newArray!(T)(nrow);
-    //auto rhs = new T[nrow];
     rhs[] = _rhs;
     prependColumn(rhs);
   }
@@ -314,7 +271,6 @@ mixin template MatrixGubbings(T)
     long nCol = end - start;
     long _len = nrow * nCol;
     auto arr = newArray!(T)(_len);
-    //auto arr = new T[_len];
     auto startIndex = start*nrow;
     long iStart = 0;
     for(long i = 0; i < nCol; ++i)
@@ -367,7 +323,6 @@ mixin template MatrixGubbings(T)
       auto start = index*nrow;
       long _len = data.length - nrow;
       auto _data = newArray!(T)(_len);
-      //T[] _data = new T[_len];
       _data[0..start] = data[0..start];
       _data[start..$] = data[(start + nrow)..$];
       data = _data;
@@ -393,14 +348,9 @@ mixin template MatrixGubbings(T)
     /* Replace any other column */
     }else{
       auto start = index*nrow;
-      //T[] newdata = new T[data.length - nrow];
       data[start..(start + nrow)] = col;
       return this;
     }
-  }
-  Matrix!(T) refColumnAssign(Vector!(T) col, long index)
-  {
-    return refColumnAssign(col.array, index);
   }
   Matrix!(T) refColumnAssign(T col, long index)
   {
@@ -417,7 +367,6 @@ mixin template MatrixGubbings(T)
     /* Replace any other column */
     }else{
       auto start = index*nrow;
-      //T[] newdata = new T[data.length - nrow];
       data[start..(start + nrow)] = col;
       return this;
     }
@@ -430,9 +379,7 @@ if(isFloatingPoint!T)
   mixin MatrixGubbings!(T);
   string toString() const
   {
-    long[] mlen = getMaxLength!T(data);
-    string dform = floatFormat(mlen);
-    writeln(dform);
+    string dform = getFormat(getRange(data));
     string repr = format(" Matrix(%d x %d)\n", dim[0], dim[1]);
     for(long i = 0; i < dim[0]; ++i)
     {
@@ -444,309 +391,6 @@ if(isFloatingPoint!T)
     }
     return repr;
   }
-  string printSubArray(long[] rows, long[] cols) const
-  {
-    string repr = format(" Matrix(%d x %d)\n", rows[1] - rows[0], cols[1] - cols[0]);
-    string[] reprArr = new string[(rows[1] - rows[0])*(cols[1] - cols[0])];
-    long k = 0; long _max = 0;
-    /* Get the maximum string length */
-    for(long i = rows[0]; i < rows[1]; ++i)
-    {
-      for(long j = cols[0]; j < cols[1]; ++j)
-      {
-        reprArr[k] = to!(string)(opIndex(i, j));
-        _max = max(cast(long)reprArr[k].length, _max);
-        k += 1;
-      }
-    }
-    k = 0;
-    for(long i = rows[0]; i < rows[1]; ++i)
-    {
-      for(long j = cols[0]; j < cols[1]; ++j)
-      {
-        repr ~= pad(reprArr[k], _max) ~ "  ";
-        k += 1;
-      }
-      repr ~= "\n";
-    }
-    return repr;
-  }
-}
-
-struct Matrix(T)
-if(isIntegral!T)
-{
-  mixin MatrixGubbings!(T);
-  string toString() const
-  {
-    long dig = 6;
-    long mlen = getMaxLength!T(data);
-    long gap = 2;
-    dig = mlen < dig ? mlen : dig;
-    string dform = "%" ~ to!string(dig + gap) ~ "d";
-    string repr = format(" Matrix(%d x %d)\n", dim[0], dim[1]);
-    for(long i = 0; i < dim[0]; ++i)
-    {
-      for(long j = 0; j < dim[1]; ++j)
-      {
-        repr ~= format(dform, opIndex(i, j));
-      }
-      repr ~= "\n";
-    }
-    return repr;
-  }
-}
-/********************************************* Vector Classes *********************************************/
-interface Vector(T)
-{
-  @property long len() const;
-  @property long length() const;
-  T opIndex(long i) const;
-  void opIndexAssign(T x, long i);
-  void opIndexOpAssign(string op)(T x, long i);
-  @property T[] array();
-  Matrix!(T) opCast(M: Matrix!(T))();
-}
-mixin template VectorGubbings(T)
-{
-  T[] data;
-  @property long len() const
-  {
-    return data.length;
-  }
-  @property long length() const
-  {
-    return data.length;
-  }
-  this(T)(T[] dat)
-  {
-    data = dat;
-  }
-  this(long n)
-  {
-    auto data = newArray!(T)(n);
-  }
-  T opIndex(long i) const
-  {
-    return data[i];
-  }
-  void opIndexAssign(T x, long i)
-  {
-    data[i] = x;
-  }
-  T opIndexOpAssign(string op)(T x, long i)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-      mixin("return data[i] " ~ op ~ "= x;");
-    else static assert(0, "Operator "~ op ~" not implemented");
-  }
-  @property T[] array()
-  {
-    return data;
-  }
-  Matrix!(T) opCast(M: Matrix!(T))()
-  {
-    return Matrix!(T)(data, [len, 1]);
-  }
-}
-class ColumnVector(T) : Vector!T
-if(isNumeric!T)
-{
-  mixin VectorGubbings!(T);
-
-  override string toString() const
-  {
-    auto n = len();
-    string repr = format("ColumnVector(%d)", n) ~ "\n";
-    for(long i = 0; i < n; ++i)
-    {
-      repr ~= to!string(data[i]) ~ "\n";
-    }
-    return repr;
-  }
-  ColumnVector!T opBinary(string op)(T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      auto ret = data.dup;
-      for(long i = 0; i < data.length; ++i)
-        mixin("ret[i] = ret[i] " ~ op ~ " rhs;");
-      return new ColumnVector!(T)(ret);
-    } else static assert(0, "Operator " ~ op ~ " not implemented");
-  }
-  ColumnVector!T opBinaryRight(string op)(T lhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      auto ret = data.dup;
-      for(long i = 0; i < data.length; ++i)
-        mixin("ret[i] = lhs " ~ op ~ " ret[i];");
-      return new ColumnVector!(T)(ret);
-    } else static assert(0, "Operator " ~ op ~ " not implemented");
-  }
-  ColumnVector!T opBinary(string op)(ColumnVector!T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      assert(data.length == rhs.data.length, "Vector lengths are not the same.");
-      auto ret = new ColumnVector!T(rhs.data.dup);
-      for(long i = 0; i < data.length; ++i)
-        mixin("ret.data[i] = data[i] " ~ op ~ " ret.data[i];");
-      return ret;
-    } else static assert(0, "Operator "~ op ~" not implemented");
-  }
-  void opOpAssign(string op)(ColumnVector!T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      assert(data.length == rhs.data.length, "Vector lengths are not the same.");
-      for(long i = 0; i < data.length; ++i)
-        mixin("data[i] = data[i] " ~ op ~ " rhs.data[i];");
-      return;
-    } else static assert(0, "Operator "~ op ~" not implemented");
-  }
-  void opOpAssign(string op)(T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      for(long i = 0; i < data.length; ++i)
-        mixin("data[i] = data[i] " ~ op ~ " rhs;");
-      return;
-    } else static assert(0, "Operator "~ op ~" not implemented");
-  }
-  @property ColumnVector!(T) dup()
-  {
-    return new ColumnVector!T(data.dup);
-  }
-}
-class RowVector(T): Vector!T
-if(isNumeric!T)
-{
-  mixin VectorGubbings!(T);
-
-  override string toString() const
-  {
-    long dig = 5;
-    string repr = format("RowVector(%d)", len()) ~ "\n" ~ to!string(data) ~ "\n";
-    return repr;
-  }
-  RowVector!T opBinary(string op)(T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      auto ret = data.dup;
-      for(long i = 0; i < data.length; ++i)
-        mixin("ret[i] = ret[i] " ~ op ~ " rhs;");
-      return new RowVector!(T)(ret);
-    } else static assert(0, "Operator " ~ op ~ " not implemented");
-  }
-  RowVector!T opBinaryRight(string op)(T lhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      auto ret = data.dup;
-      for(long i = 0; i < data.length; ++i)
-        mixin("ret[i] = lhs " ~ op ~ " ret[i];");
-      return new RowVector!(T)(ret);
-    } else static assert(0, "Operator " ~ op ~ " not implemented");
-  }
-  RowVector!T opBinary(string op)(RowVector!T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      assert(data.len == rhs.data.len, "Vector lengths are not the same.");
-      auto ret = RowVector!T(rhs.data.dup);
-      for(long i = 0; i < data.len; ++i)
-        mixin("ret.data[i] = data[i] "~ op ~ " ret.data[i];");
-      return ret;
-    } else static assert(0, "Operator "~ op ~" not implemented");
-  }
-  void opOpAssign(string op)(RowVector!T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      assert(data.len == rhs.data.len, "Vector lengths are not the same.");
-      for(long i = 0; i < data.len; ++i)
-        mixin("data[i] = data[i] "~ op ~ " rhs.data[i]");
-      return;
-    } else static assert(0, "Operator "~ op ~" not implemented");
-  }
-  void opOpAssign(string op)(T rhs)
-  {
-    static if((op == "+") | (op == "-") | (op == "*") | (op == "/") | (op == "^^"))
-    {
-      for(long i = 0; i < data.len; ++i)
-        mixin("data[i] = data[i] "~ op ~ " rhs");
-      return;
-    } else static assert(0, "Operator "~ op ~" not implemented");
-  }
-  @property RowVector!(T) dup()
-  {
-    return new RowVector!T(data.dup);
-  }
-}
-
-// Convenience functions for matrices
-/****************************************************************************/
-/* Convinient function for constructor with type inference */
-Matrix!(T) matrix(T)(T[] data, long rows, long cols)
-{
-  assert(rows*cols == data.length, 
-        "dimension of matrix inconsistent with length of array");
-  return Matrix!(T)(data, [rows, cols]);
-}
-/* Constructor for matrix with data and dimension array */
-Matrix!(T) matrix(T)(T[] data, long[] dim)
-{
-  assert(dim[0]*dim[1] == data.length, 
-        "dimension of matrix inconsistent with length of array");
-  return Matrix!(T)(data, dim);
-}
-Matrix!(T) matrix(T)(T[] dat, long rows)
-{
-  assert(rows * rows == dat.length, 
-        "dimension of matrix inconsistent with length of array");
-  return Matrix!(T)(dat, [rows, rows]);
-}
-
-
-Matrix!(T) fillMatrix(T)(T x, long[] dim)
-{
-  long n = dim[0] * dim[1];
-  auto data = newArray!(T)(n);
-  data[] = x;
-  return Matrix!(T)(data, dim.dup);
-}
-Matrix!(T) fillMatrix(T)(T x, long nrow, long ncol)
-{
-  return fillMatrix!(T)(x, [nrow, ncol]);
-}
-
-Matrix!(T) matrix(T)(long rows, long cols)
-{
-  long n = rows * cols;
-  auto data = newArray!(T)(n);
-  return Matrix!(T)(data, [rows, cols]);
-}
-Matrix!(T) matrix(T)(long[] dim)
-{
-  return matrix(dim[0], dim[1]);
-}
-
-/* Constructor for square matrix */
-Matrix!(T) matrix(T)(Matrix!(T) m)
-{
-  return Matrix!(T)(m);
-}
-
-
-Matrix!(T) zerosMatrix(T)(long[] dim)
-{
-  return fillMatrix!(T)(cast(T)0, dim[0], dim[1]);
-}
-Matrix!(T) zerosMatrix(T)(long nrow, long ncol)
-{
-  return fillMatrix!(T)(cast(T)0, nrow, ncol);
 }
 
 // Create random matrix
@@ -770,28 +414,3 @@ Matrix!T createRandomMatrix(T)(ulong[] dim)
   return createRandomMatrix!(T)(dim[0], dim[1]);
 }
 
-// Convenience functions for vectors
-/****************************************************************************/
-ColumnVector!(T) fillColumn(T)(T x, long n)
-{
-  if(n > 0)
-  {
-    auto data = newArray!(T)(n);
-    data[] = x;
-    return new ColumnVector!(T)(data);
-  }
-  return new ColumnVector!(T)(new T[0]);
-}
-ColumnVector!(T) zerosColumn(T)(long n)
-{
-  return fillColumn!(T)(cast(T)0, n);
-}
-auto onesColumn(T)(long n)
-{
-  return fillColumn!(T)(cast(T)1, n);
-}
-
-RowVector!(T) rowVector(T)(T[] data)
-{
-  return new RowVector!(T)(data);
-}
