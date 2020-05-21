@@ -10,4 +10,5 @@ We'll look at the times for the dot kernel only, but we don't allow use of BLAS 
 ## The benchmarks
 
 The plot of the benchmarks are shown below:
+
 <img src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg" alt="Language Benchmarks for Kernel Matrix Calculation" width="500"/>
