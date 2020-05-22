@@ -46,6 +46,23 @@ $ chpl --version
 chpl version 1.22.0
 ```
 
+### Compilation
+
+Chapel
+```
+chpl script.chpl kernelmatrix.chpl --fast && ./script
+```
+
+D
+```
+ldc2 script.d kernelmatrix.d arrays.d -O5 --boundscheck=off --ffast-math && ./script
+```
+
+Julia - no compilation required but can be run from command line:
+```
+julia script.jl
+```
+
 ## Implementations 
 
 Efforts were made to avoid non standard libraries while implementing these kernel functions. The reasons for this are:
