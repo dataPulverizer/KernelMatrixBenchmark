@@ -229,7 +229,7 @@ Julia has good support for both concurrency and parallelism, but consumes the mo
 
 D has industry strength support for parallelism and concurrency, it’s the most efficient from a memory and execution point of view, each thread in D will usually use the least memory out of the three – though its support for threading is much less well documented with examples.
 
-Given the choice of writing parallel code in Chapel, D, and Julia, you could get more out of your system resources using D, then Chapel, and finally Julia – though this is separate from execution times.
+Given the choice of writing parallel code in Chapel, D, and Julia, you could get more out of your system resources using D, then Chapel, and finally Julia – though this is a separate issue from execution times.
 
 ### Standard Library
 
