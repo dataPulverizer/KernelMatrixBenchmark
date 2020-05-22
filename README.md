@@ -158,11 +158,11 @@ In the Julia the macro changes discussed previously markedly improved the perfor
 
 ## Quality Of Life
 
-This section examines the relative pros and cons around the convenience and ease of use of each language. People underestimate the effort it takes to use a language day to day, the support and infrastructure it takes is a lot so it’s worth comparing various facets of each language. To avoid the TLDR the end of this paragraph has a handy table comparing the language features discussed here. Every effort has been made to be as objective as possible but comparing programming languages is difficult, bias prone, and contentious so read this section with that in mind. Also some elements are from the “data science”/technical/scientific computing and others are more general.
+This section examines the relative pros and cons around the convenience and ease of use of each language. People underestimate the effort it takes to use a language day to day, the support and infrastructure required is a lot so it is worth comparing various facets of each language. Readers seeking to avoid the TLDR should scroll to the end of this section for the table comparing the language features discussed here. Every effort has been made to be as objective as possible but comparing programming languages is difficult, bias prone, and contentious so read this section with that in mind. Some elements looked at such as arrays are from the “data science”/technical/scientific computing opint of view and others are more general.
 
 ### Interactivity
 
-When developing code you generally want a fast code/compile/result loop so that you can quickly observe the results of what you’ve written so that you can progress or make necessary changes; Julia’s interpreter is hands down the best for this and offers a smooth and feature-rich development experience, but D comes a close second. If you’ve every compiled anything using a C++ compiler this loop can be rather tedious even when compiling rather simple code. D has three compilers, the standard DMD compiler, the LLVM-based LDC compiler, and the GCC-based GDC. In this process, I used the DMD and LDC compilers. DMD has **very** fast compilation times which is great for the development process. Once you have developed your code, the LDC compiler is great for getting great performance from what you’ve written. The Chapel compiler is very slow in comparison, to give you an idea running Linux’s `time` command on DMD vs Chapel’s compiler with no optimizations gives us for D:
+When developing code programmers want a fast code/compile/result loop to quickly observe results and outputsin order to make progress or necessary changes; Julia’s interpreter is hands down the best for this and offers a smooth and feature-rich development experience, and D comes a close second. This code/compile/result loop in compilers for example gcc's C++ can be slow even when compiling simple code. D has three compilers, the standard DMD compiler, the LLVM-based LDC compiler, and the GCC-based GDC. In this development process, the DMD and LDC compilers were used. DMD has **very** fast compilation times which is great for development. The LDC compiler is great for getting great performance. Chapel's compiler is very slow in comparison, to give an example, running Linux’s `time` command on DMD vs Chapel’s compiler for the kernel matrix code with no optimizations gives us for D:
 
 ```
 real	0m0.545s
@@ -176,7 +176,7 @@ real	0m5.980s
 user	0m5.787s
 sys	0m0.206s
 ```
-That’s a large actual and *psychological* difference, it makes you more reluctant to check your work if you have to wait for outputs especially when they could run faster than it takes to compile.
+That’s a large actual and *psychological* difference, it can make programmers reluctant to check their work and delay the development loop if they have to wait for outputs especially when source code increases in volume and compilation times become significant.
 
 ### Documentation and examples
 
