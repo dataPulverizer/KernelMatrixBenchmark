@@ -209,7 +209,7 @@ Perhaps one factor affecting Chapel’s adoption is lack of examples, since its 
 
 ### Multi-dimensional Array support
 
-“Arrays” here do not refer to native C/C++ style arrays but mathematical arrays. Julia and Chapel ship with array support and D does not. In the implementation of kernel matrix, I wrote my own matrix object in D – which is not difficult if you understand the principle but it's not something a user wants to do, however D has a linear algebra library called Lubeck which has impressive performance characteristics and interfaces with all the usual BLAS implementations. Julia’s arrays are by far the easiest and most familiar, Chapel arrays are more difficult to get started than Julia’s but are designed to be run on single core, multicore and computer clusters using the same or very similar code which is a good unique selling point.
+“Arrays” here do not refer to native C/C++ style arrays available in D but mathematical arrays. Julia and Chapel ship with array support and D does not. In the implementation of kernel matrix, I wrote my own matrix object in D – which is not difficult if you understand the principle but it's not something a user wants to do, however D has a linear algebra library called Lubeck which has impressive performance characteristics and interfaces with all the usual BLAS implementations. Julia’s arrays are by far the easiest and most familiar, Chapel arrays are more difficult to get started than Julia’s but are designed to be run on single core, multicore and computer clusters using the same or very similar code which is a good unique selling point.
 
 ### Language power
 
