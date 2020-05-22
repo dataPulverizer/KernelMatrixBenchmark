@@ -102,7 +102,7 @@ Chapel code was the most difficult to optimise for performance and required the 
 
 ### D
 
-D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the benefit came from the compiler (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
+D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the benefit came from the compiler used and flags selected (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
 
 ```
 auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
