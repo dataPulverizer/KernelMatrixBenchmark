@@ -21,7 +21,7 @@ While preparing the code for this article, the Chapel, D, and Julia communities 
 | 20000 | 11.2670   | 11.1537    | 16.7087   |
 | 30000 | 31.0559   | 29.2007    | 40.2499   |
 
-Table shows the average execution times (seconds) for each language for varying number of items (n).
+Table shows the average execution times (seconds) for each language for varying number of items (n) (Dot kernel).
 
 ## Environment
 
