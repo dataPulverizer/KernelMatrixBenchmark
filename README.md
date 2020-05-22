@@ -19,7 +19,32 @@ While preparing the code for this article, the Chapel, D, and Julia communities 
 | 20000 | 11.2670   | 11.1537    | 16.7087   |
 | 30000 | 31.0559   | 29.2007    | 40.2499   |
 
-### Implementations 
+## Environment
+
+The code was run on a computer with an Ubuntu 20.04 OS, 32 GB memory and an Intel® Core™ i9-8950HK CPU @ 2.90GHz with 6 cores and 12 threads.
+
+```
+$ julia --version
+julia version 1.4.1
+```
+
+```
+$ dmd --version
+DMD64 D Compiler v2.090.1
+```
+
+```
+ldc2 --version
+LDC - the LLVM D compiler (1.18.0):
+  based on DMD v2.088.1 and LLVM 9.0.0
+```
+
+```
+$ chpl --version
+chpl version 1.22.0
+```
+
+## Implementations 
 
 Efforts were made to avoid non standard libraries while implementing these kernel functions. The reasons for this are:
 
@@ -27,7 +52,7 @@ Efforts were made to avoid non standard libraries while implementing these kerne
 * Packages outside standard libraries can go extinct so avoiding external libraries keeps the article and code relevant.
 * It's completely transparent and shows how each language works.
 
-#### Chapel
+### Chapel
 
 Chapel uses a `forall` loop to parallelizes the code over threads. Also C pointers to each item is used rather than the default array notation and `guided` iteration over the indexes:
 
@@ -54,7 +79,7 @@ proc calculateKernelMatrix(K, data: [?D] ?T)
 
 Chapel code was the most difficult to optimise for performance and required the most in terms of code changes.
 
-#### D
+### D
 
 D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the benefit came from the compiler (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
 
@@ -77,7 +102,7 @@ auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
 }
 ```
 
-#### Julia
+### Julia
 
 The Julia code uses `@threads` macro for parallelising the code and `@views` macro for referencing arrays. One confusing thing about Julia's arrays is their reference status. Sometimes as in this case arrays will behave like value objects and they have to be referenced by using the `@views` macro otherwise they generate copies, at other times they behave like reference objects, for example passing them into a function. It can be a little tricky dealing with this because you don't always know what set of operations will generate a copy, but where this occurs `@views` provides a good solution.
 
@@ -113,46 +138,21 @@ end
 
 These optimizations are quite visible but very easy to apply.
 
-### Environment
-
-All the code was run on a computer with Ubuntu 20.04 with 32 GB memory and an Intel® Core™ i9-8950HK CPU @ 2.90GHz with 6 cores and 12 threads.
-
-```
-$ julia --version
-julia version 1.4.1
-```
-
-```
-$ dmd --version
-DMD64 D Compiler v2.090.1
-```
-
-```
-ldc2 --version
-LDC - the LLVM D compiler (1.18.0):
-  based on DMD v2.088.1 and LLVM 9.0.0
-```
-
-```
-$ chpl --version
-chpl version 1.22.0
-```
-
 ## Performance optimization
 
 The process of performance optimization in all three languages was very different and all three communities were very helpful in the process. But there were some common themes.
 
-* Direct dispatching of kernel function types rather than using polymorphism. This means that when passing the kernel function to carry out the calculation, use a concrete type and lean on parametric (compile time) polymorphism rather than runtime polymorphism were dispatch to virtual function carries an overhead. In this case it made little or no difference.
+* Direct dispatching of kernel function types rather than using polymorphism. This means that when passing the kernel function, use parametric (static compile time) polymorphism rather than runtime (dynamic) polymorphism were dispatch with virtual functions carries a performance penalty. In this case it made little or no difference.
 * Using views rather than copying data over multiple threads – makes a big difference
-* Parallelising the calculations over all the threads – makes a huge difference
+* Parallelising the calculations – makes a huge difference
 * Knowing if your array is row/column major and using that in your calculation makes a huge difference.
-* Bounds checks and compiler optimizations – makes a huge difference in Chapel and D.
+* Bounds checks and compiler optimizations – makes a huge difference especially in Chapel and D.
 
-In terms of language specific issues, getting to performant code in Chapel was by far the most challenging and the Chapel code changed the most from easy to read array operations to using pointers and guided iterations. But on the compiler it was relatively easy to just add `--fast`.
+In terms of language specific issues, getting to performant code in Chapel was by far the most challenging and the Chapel code changed the most from easy to read array operations to using pointers and guided iterations. But on the compiler size it was relatively easy to add `--fast`.
 
-In D the code changed very little and most of the performance was gained in the compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 different `-O` optimization levels and a myriad of other flags that affect performance in different ways. In this case the flags `-O5 --boundscheck=off –ffast-math` bounds checking and LLVM’s fast-math gave the best results.
+In D the code changed very little and most of the performance was gained in compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 different `-O` optimization levels and a myriad of other flags that affect performance in different ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing bounds checking and LLVM’s fast-math.
 
-In the Julia the code macro changes discussed previously markedly improved the performance but they were not too intrusive. I did attempt changing the optimization `-O` level but it didn’t improve the performance.
+In the Julia the macro changes discussed previously markedly improved the performance but they were not too intrusive. I did attempt changing the optimization `-O` level but it didn’t improve the performance.
 
 ## Quality Of Life
 
