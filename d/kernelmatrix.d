@@ -17,8 +17,6 @@ class DotProduct(T): AbstractKernel!(T)
 {
   @nogc:
   public:
-  //pragma(inline, true):
-  //@fastmath
   T opCall(T[] x, T[] y) const
   {
     //assert(x.length == y.length, "x and y are not the same length.");
@@ -131,7 +129,6 @@ auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
   foreach(j; taskPool.parallel(iota(n)))
   {
     auto arrj = data.refColumnSelect(j).array;
-    //for(long i = j; i < n; ++i)
     foreach(long i; j..n)
     {
       mat[i, j] = kernel(data.refColumnSelect(i).array, arrj);
