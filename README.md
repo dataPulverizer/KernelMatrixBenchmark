@@ -163,15 +163,15 @@ These optimizations are quite visible but very easy to apply.
 
 The process of performance optimization in all three languages was very different and all three communities were very helpful in the process. But there were some common themes.
 
-* Direct dispatching of kernel function types rather than using polymorphism. This means that when passing the kernel function, use parametric (static compile time) polymorphism rather than runtime (dynamic) polymorphism were dispatch with virtual functions carries a performance penalty. In this case it made little or no difference.
-* Using views rather than copying data over multiple threads – makes a big difference
-* Parallelising the calculations – makes a huge difference
+* Static dispatching of kernel functions instead of using polymorphism. This means that when passing the kernel function, use parametric (static compile time) polymorphism rather than runtime (dynamic) polymorphism were dispatch with virtual functions carries a performance penalty. In this case it made little or no difference.
+* Using views/references rather than copying data over multiple threads – makes a big difference.
+* Parallelising the calculations – makes a huge difference.
 * Knowing if your array is row/column major and using that in your calculation makes a huge difference.
 * Bounds checks and compiler optimizations – makes a huge difference especially in Chapel and D.
 
-In terms of language specific issues, getting to performant code in Chapel was by far the most challenging and the Chapel code changed the most from easy to read array operations to using pointers and guided iterations. But on the compiler size it was relatively easy to add `--fast`.
+In terms of language specific issues, getting to performant code in Chapel was by far the most challenging and the Chapel code changed the most from easy to read array operations to using pointers and guided iterations. But on the compiler side it was relatively easy to add `--fast` and get a very large optimization boost.
 
-In D the code changed very little and most of the performance was gained in compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 different `-O` optimization levels and a myriad of other flags that affect performance in different ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing bounds checking and LLVM’s fast-math.
+In D the code changed very little and most of the performance was gained in compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 different `-O` optimization levels and a myriad of other flags that affect performance in various ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing aggressive compiler optimizations, bounds checking, and LLVM’s fast-math.
 
 In the Julia the macro changes discussed previously markedly improved the performance but they were not too intrusive. I did attempt changing the optimization `-O` level but it didn’t improve the performance.
 
