@@ -245,7 +245,7 @@ C interop is easy in all three languages; Chapel’s has good documentation but 
 
 ### Community
 
-All three languages have convenient places where users can ask questions. For Chapel, the easiest place is Gitter, for Julia it’s Discourse (though there is a Julia Gitter) and for D it’s the official website forum. In terms of activity Julia community is the most active, followed by D and then Chapel. Though I’ve found that you’ll get good responses from all three communities but you’ll probably get quicker answers from D and Julia communities.
+All three languages have convenient places where users can ask questions. For Chapel, the easiest place is Gitter, for Julia it’s Discourse (though there is a Julia Gitter) and for D it’s the official website forum. The Julia community is the most active, followed by D and then Chapel. I’ve found that you’ll get good responses from all three communities but you’ll probably get quicker answers from D and Julia communities.
 
 |                             | Chapel        | D             | Julia    |
 | --------------------------- |:-------------:|:-------------:| --------:|
@@ -257,7 +257,7 @@ All three languages have convenient places where users can ask questions. For Ch
 | Standard Library            | Good          | Great         | Great    |
 | Package Manager & Ecosystem | Nascent       | Best          | Great    |
 | C Integration               | Great         | Great         | Great    |
-| Community                   | Small         | Large         | Biggest  |
+| Community                   | Small         | Vibrant       | Largest  |
 
 Table for quality of life features in Chapel, D & Julia
 
