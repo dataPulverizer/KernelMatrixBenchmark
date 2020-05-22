@@ -175,7 +175,7 @@ In the Julia the macro changes discussed previously markedly improved the perfor
 
 ## Quality of life
 
-This section examines the relative pros and cons around the convenience and ease of use of each language. People underestimate the effort it takes to use a language day to day, the support and infrastructure required is a lot so it is worth comparing various facets of each language. Readers seeking to avoid the TLDR should scroll to the end of this section for the table comparing the language features discussed here. Every effort has been made to be as objective as possible but comparing programming languages is difficult, bias prone, and contentious so read this section with that in mind. Some elements looked at such as arrays are from the “data science”/technical/scientific computing opint of view and others are more general.
+This section examines the relative pros and cons around the convenience and ease of use of each language. People underestimate the effort it takes to use a language day to day, the support and infrastructure required is a lot so it is worth comparing various facets of each language. Readers seeking to avoid the TLDR should scroll to the end of this section for the table comparing the language features discussed here. Every effort has been made to be as objective as possible but comparing programming languages is difficult, bias prone, and contentious so read this section with that in mind. Some elements looked at such as arrays are from the “data science”/technical/scientific computing point of view and others are more general.
 
 ### Interactivity
 
