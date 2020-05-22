@@ -241,7 +241,7 @@ In terms of documentation, usage and features, D’s Dub package manager is the 
 
 ### C Integration
 
-C interop is easy in all three languages; though Chapel’s is not as well popularised but has good documentation but D’s documentation is better though Julia’s documentation is the most comprehensive. Oddly enough though, none of the language documentations show the commands required to compile your own C code and integrate it with the language which is an oversight especially when it comes to novices. It’s easy to search for and find examples for D and Julia though.
+C interop is easy in all three languages; Chapel’s has good documentation but is not as well popularised as the others. D’s documentation is better and Julia’s documentation is the most comprehensive. Oddly enough though, none of the language documentations show the commands required to compile your own C code and integrate it with the language which is an oversight especially when it comes to novices. It is however easy to search for and find examples for the compilation process in D and Julia.
 
 ### Community
 
