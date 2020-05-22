@@ -73,7 +73,7 @@ Efforts were made to avoid non standard libraries while implementing these kerne
 
 ### Chapel
 
-Chapel uses a `forall` loop to parallelizes the code over threads. Also C pointers to each item is used rather than the default array notation and `guided` iteration over the indexes:
+Chapel uses a `forall` loop to parallelize over threads. Also C pointers to each item is used rather than the default array notation and `guided` iteration over indices are used:
 
 ```
 //Chapel
