@@ -233,7 +233,7 @@ Given the choice of writing parallel code in Chapel, D, and Julia, you could get
 
 ### Standard Library
 
-How good is the standard library of all three languages in general? What range of tasks do they allow users to easily tend to? It’s a tough question because library quality and documentation factor in. All three languages have very good standard libraries, D has the most comprehensive standard library, but Julia is great second then Chapel, but things are never that simple. For example for a user writing code for binary i/o Julia may be the best choice, its the most straightforward clear interface and documentation, followed by Chapel and then D, though in my implementation of an IDX file reader, D’s i/o was the fastest, and the Julia code was easy to write for cases unavailable in the other two languages.
+How good is the standard library of all three languages in general? What range of tasks do they allow users to easily tend to? It’s a tough question because library quality and documentation factor in. All three languages have very good standard libraries, D has the most comprehensive standard library, but Julia is great second then Chapel, but things are never that simple. For example, a user seeking to writing binary i/o may find Julia the easiest to start with, it has the most straightforward clear interface and documentation, followed by Chapel and then D, though in my implementation of an IDX file reader, D’s i/o was the fastest, but then Julia code was easy to write for cases unavailable in the other two languages.
 
 ### Package Managers & Package Ecosystems
 
