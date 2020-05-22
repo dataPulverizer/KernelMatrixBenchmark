@@ -1,4 +1,4 @@
-# A look at Chapel, D, and Julia using kernel matrix calculations
+# A look at Chapel, D, and Julia using Kernel Matrix calculations
 
 *Date: 2020-05-22*
 
