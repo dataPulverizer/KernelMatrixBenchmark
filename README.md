@@ -173,7 +173,7 @@ In terms of language specific issues, getting to performant code in Chapel was b
 
 In D the code changed very little and most of the performance was gained in compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 different `-O` optimization levels and a myriad of other flags that affect performance in various ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing aggressive compiler optimizations, bounds checking, and LLVM’s fast-math.
 
-In the Julia the macro changes discussed previously markedly improved the performance but they were not too intrusive. I did attempt changing the optimization `-O` level but it didn’t improve the performance.
+In the Julia the macro changes discussed previously markedly improved the performance but they were not too intrusive. I tried changing the optimization `-O` level but this did not improve performance.
 
 ## Quality of life
 
