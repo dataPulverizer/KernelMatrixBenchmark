@@ -156,7 +156,7 @@ In D the code changed very little and most of the performance was gained in comp
 
 In the Julia the macro changes discussed previously markedly improved the performance but they were not too intrusive. I did attempt changing the optimization `-O` level but it didn’t improve the performance.
 
-## Quality Of Life
+## Quality of life
 
 This section examines the relative pros and cons around the convenience and ease of use of each language. People underestimate the effort it takes to use a language day to day, the support and infrastructure required is a lot so it is worth comparing various facets of each language. Readers seeking to avoid the TLDR should scroll to the end of this section for the table comparing the language features discussed here. Every effort has been made to be as objective as possible but comparing programming languages is difficult, bias prone, and contentious so read this section with that in mind. Some elements looked at such as arrays are from the “data science”/technical/scientific computing opint of view and others are more general.
 
@@ -192,9 +192,9 @@ Perhaps one factor affecting Chapel’s adoption is lack of examples, since its 
 
 “Arrays” here do not refer to native C/C++ style arrays but mathematical arrays. Julia and Chapel ship with array support and D does not. In the implementation of kernel matrix, I wrote my own matrix object in D – which is not difficult if you understand the principle but it's not something a user wants to do, however D has a linear algebra library called Lubeck which has impressive performance characteristics and interfaces with all the usual BLAS implementations. Julia’s arrays are by far the easiest and most familiar, Chapel arrays are more difficult to get started than Julia’s but are designed to be run on single core, multicore and computer clusters using the same or very similar code which is a good unique selling point.
 
-### Language Power
+### Language power
 
-Since Julia is a dynamic programming language some might say, “well Julia’s is a dynamic language which is far more permissive than static programming languages therefore the debate is over” but it’s more complicated than that. There is power in static type systems, Julia has a type system similar in nature to type systems from static languages so you can write code as if you were using a static language but you can do things reserved only for dynamic languages, it has a highly developed generic and meta-programming syntax and powerful macros. It also has highly flexible object system and multiple dispatch. This mix of features is what makes Julia is the most powerful language out of the three.
+Since Julia is a dynamic programming language some might say, “well Julia’s is a dynamic language which is far more permissive than static programming languages therefore the debate is over” but it’s more complicated than that. There is power in static type systems, Julia has a type system similar in nature to type systems from static languages so you can write code as if you were using a static language but you can do things reserved only for dynamic languages, it has a highly developed generic and meta-programming syntax and powerful macros. It also has highly flexible object system and multiple dispatch. This mix of features is what makes Julia is the most powerful language of the three.
 
 D was intended to be a replacement for C++ and takes very much after C++ (and also borrows from Java) but makes template programming and compile time evaluation much more user friendly than in C++, it is a single dispatch language (though multi-methods are available in a package), instead of macros D has string and template “mixins” which serve a similar purpose.
 
