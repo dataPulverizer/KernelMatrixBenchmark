@@ -258,6 +258,7 @@ All three languages have convenient places where users can ask questions. For Ch
 | Package Manager & Ecosystem | Nascent       | Best          | Great    |
 | C Integration               | Great         | Great         | Great    |
 | Community                   | Small         | Large         | Biggest  |
+
 Table for quality of life features in Chapel, D & Julia
 
 ## Summary
