@@ -2,8 +2,6 @@ include("KernelMatrix.jl")
 
 
 function bench(::Type{T}, Kernel::K, n::Array{Int64, 1}, verbose::Bool = true) where {K, T}
-  # Warmup
-  calculateKernelMatrix(Kernel, rand(T, (10, 10)));
   times::Array{Float64, 1} = zeros(Float64, length(n))
   for i in 1:length(n)
     _times::Array{Float64, 1} = zeros(Float64, 3)
@@ -26,6 +24,11 @@ end
 
 function main()
   K = DotProduct();
+  
+  precompile(kernel, (typeof(K), Array{Float32, 1}, Array{Float32, 1}))
+  precompile(calculateKernelMatrix, (typeof(K), Array{Float32, 2}))
+  precompile(bench, (DataType, typeof(K), Array{Int64, 1}))
+  
   tt = bench(Float32, K, [1000, 5000, 
   10_000, 20_000, 30_000])
   println("bench: ", tt)
