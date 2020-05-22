@@ -237,7 +237,7 @@ How good is the standard library of all three languages in general? What range o
 
 ### Package Managers & Package Ecosystems
 
-In terms of documentation, usage and features, D’s Dub package manager is the most comprehensive. D also has a rich package ecosystem in the [Dub website](https://code.dlang.org/), Julia’s package manager runs tightly integrated with GitHub and is a good package system with good documentation. Chapel has a package manager but does not a highly developed package ecosystem.
+In terms of documentation, usage and features, D’s Dub package manager is the most comprehensive. D also has a rich package ecosystem in the [Dub website](https://code.dlang.org/), Julia’s package manager runs tightly integrated with GitHub and is a good package system with good documentation. Chapel has a package manager but does not have a highly developed package ecosystem.
 
 ### C Integration
 
