@@ -162,7 +162,7 @@ This section examines the relative pros and cons around the convenience and ease
 
 ### Interactivity
 
-When developing code programmers want a fast code/compile/result loop to quickly observe results and outputsin order to make progress or necessary changes; Julia’s interpreter is hands down the best for this and offers a smooth and feature-rich development experience, and D comes a close second. This code/compile/result loop in compilers for example gcc's C++ can be slow even when compiling simple code. D has three compilers, the standard DMD compiler, the LLVM-based LDC compiler, and the GCC-based GDC. In this development process, the DMD and LDC compilers were used. DMD has **very** fast compilation times which is great for development. The LDC compiler is great for getting great performance. Chapel's compiler is very slow in comparison, to give an example, running Linux’s `time` command on DMD vs Chapel’s compiler for the kernel matrix code with no optimizations gives us for D:
+When developing code programmers want a fast code/compile/result loop to quickly observe results and outputs in order to make progress or necessary changes; Julia’s interpreter is hands down the best for this and offers a smooth and feature-rich development experience, and D comes a close second. This code/compile/result loop in compilers for example gcc's C++ can be slow even when compiling simple code. D has three compilers, the standard DMD compiler, the LLVM-based LDC compiler, and the GCC-based GDC. In this development process, the DMD and LDC compilers were used. DMD has **very** fast compilation times which is great for development. The LDC compiler is great for getting great performance. Chapel's compiler is very slow in comparison, to give an example, running Linux’s `time` command on DMD vs Chapel’s compiler for the kernel matrix code with no optimizations gives us for D:
 
 ```
 real	0m0.545s
@@ -177,6 +177,8 @@ user	0m5.787s
 sys	0m0.206s
 ```
 That’s a large actual and *psychological* difference, it can make programmers reluctant to check their work and delay the development loop if they have to wait for outputs especially when source code increases in volume and compilation times become significant.
+
+It is worth mentioning however that when developing packages in Julia compilation times can be very long, and users have noticed that when they load some packages compilation times can stretch so the experience of the development loop in Julia could vary, but in this specific case the process was seamless.
 
 ### Documentation and examples
 
