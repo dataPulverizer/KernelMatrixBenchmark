@@ -1,5 +1,7 @@
 # A look at Chapel, D, and Julia using kernel matrix calculations
 
+*Date: 2020-05-22*
+
 ## Introduction
 
 It seems each time you turn around there is a new programming language aimed at solving some specific problem set. Increased proliferation of programming languages and data are deeply connected in a fundamental way and increasing demand for “data science” computing is a related phenomenon. In the field of scientific computing Chapel, D, and Julia  are highly relevant programming languages. They arise from different needs and are aimed at different problem sets. Chapel focuses on data parallelism on single multicore machines and large clusters, D initially was developed as a more productive safer alternative to C++ and Julia was developed for technical and scientific computing and aimed at getting the best of both worlds from static programming languages which have high performance and safety with the flexibility of dynamic programming languages, however they all emphasize performance a feature. In this article, we look at how their performance varies over kernel matrix calculations, investigate approaches to code optimization and other usability features of the languages.
