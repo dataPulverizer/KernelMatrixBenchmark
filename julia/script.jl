@@ -2,7 +2,6 @@ include("KernelMatrix.jl")
 using DelimitedFiles: writedlm;
 using InteractiveUtils: @code_warntype;
 
-
 function bench(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = true) where {T}
   times::Array{Float64, 1} = zeros(Float64, length(n))
   for i in 1:length(n)
@@ -23,7 +22,6 @@ function bench(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = tr
   return times
 end
 
-# benchKernel(DotProduct{Float32}(), [1000, 5000, 10_000])
 function benchKernel(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = true) where {T}
   precompile(kernel, (typeof(Kernel), Array{T, 1}, Array{T, 1}))
   precompile(calculateKernelMatrix, (typeof(Kernel), Array{T, 2}))
@@ -84,7 +82,7 @@ end
 
 #=
   To run:
-  julia script.jl
-  bench: [0.01053166389465332, 0.3132596015930176, 2.171336015065511, 11.15370806058248, 29.200666030248005]
+  /usr/bin/time -v julia script.jl
 =#
 main(Float32)
+
