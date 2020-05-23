@@ -37,11 +37,6 @@ function benchKernel(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Boo
   return (n, times)
 end
 
-#=
-  To run:
-  julia script.jl
-  bench: [0.01053166389465332, 0.3132596015930176, 2.171336015065511, 11.15370806058248, 29.200666030248005]
-=#
 function runKernelBenchmarks(kernels::NTuple{N, AbstractKernel{T}}, n::Array{Int64, 1}, verbose::Bool = true) where {N, T}
   results = Array{Tuple{Array{Int64, 1}, Array{Float64, 1}}, 1}(undef, length(kernels))
   for i in 1:length(results)
