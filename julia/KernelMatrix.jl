@@ -1,13 +1,6 @@
 using Base.Threads: @threads, @spawn
 using Random: shuffle!
 using LinearAlgebra
-#using LoopVectorization: @avx
-
-#=
-  Avoid conflicts when multi-threading
-  when using BLAS
-=#
-# BLAS.set_num_threads(1)
 
 # Kernel Methods
 #===============#
@@ -79,20 +72,6 @@ end
 
 #=======================================================================================#
 
-"""
-  Function to calculate the kernel matrix
-  It's a symmetrix matrix so only the diagonal and lower part of the 
-  matrix are actually calculated
-
-  T - The element type to return - we accept that the user may want to output
-      a different element type than the type of data because the kernel
-      matrix can be very large so the output may be down-sampled.
-  K - The kernel to use
-  data - 2D Arrays/Matrix with the data
-  trans - does the array/matrix need to be transposed the kernel matrix
-      is calculated over columns (not rows) for performance reasons because 
-      arrays in Julia are column major
-"""
 function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKernel,T <: AbstractFloat}
   n = size(data)[2]
   mat = zeros(T, n, n)
@@ -103,5 +82,4 @@ function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKe
   end
   return Symmetric(mat, :L)
 end
-
 
