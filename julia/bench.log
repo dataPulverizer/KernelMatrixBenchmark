@@ -1,0 +1,394 @@
+chib@mlPrecision:~/code/blogs/KernelMatrixjl/julia$ /usr/bin/time -v julia script.jl
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Core.Compiler.Const(DotProduct{Float32}(), false)
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(DotProduct{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((DotProduct{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(DotProduct{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((DotProduct{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(DotProduct{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((DotProduct{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.030449310938517254 seconds.
+Detailed times: [0.06687402725219727, 0.01184701919555664, 0.012626886367797852]
+Average time for n = 5000, 0.372217337290446 seconds.
+Detailed times: [0.3897571563720703, 0.3830878734588623, 0.3438069820404053]
+Average time for n = 10000, 2.1990960439046225 seconds.
+Detailed times: [2.298344135284424, 2.1390039920806885, 2.159940004348755]
+Average time for n = 20000, 10.859754959742228 seconds.
+Detailed times: [10.868445873260498, 10.85337209701538, 10.857446908950806]
+Average time for n = 30000, 26.105391025543213 seconds.
+Detailed times: [26.123581886291504, 26.080098152160645, 26.11249303817749]
+
+
+Benchmark for kernel: DotProduct{Float32}()
+times: [0.030449310938517254, 0.372217337290446, 2.1990960439046225, 10.859754959742228, 26.105391025543213]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Gaussian{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Gaussian{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Gaussian{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Gaussian{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Gaussian{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Gaussian{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Gaussian{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.022680282592773438 seconds.
+Detailed times: [0.045126914978027344, 0.01143193244934082, 0.011482000350952148]
+Average time for n = 5000, 0.3409159978230794 seconds.
+Detailed times: [0.34122300148010254, 0.3346130847930908, 0.3469119071960449]
+Average time for n = 10000, 2.300952672958374 seconds.
+Detailed times: [2.3121399879455566, 2.3057479858398438, 2.2849700450897217]
+Average time for n = 20000, 11.71502129236857 seconds.
+Detailed times: [11.660815000534058, 11.66298794746399, 11.821260929107666]
+Average time for n = 30000, 28.422693649927776 seconds.
+Detailed times: [28.48027992248535, 28.37995409965515, 28.407846927642822]
+
+
+Benchmark for kernel: Gaussian{Float32}(1.0f0)
+times: [0.022680282592773438, 0.3409159978230794, 2.300952672958374, 11.71502129236857, 28.422693649927776]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Polynomial{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Polynomial{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Polynomial{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Polynomial{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Polynomial{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Polynomial{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Polynomial{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.02387833595275879 seconds.
+Detailed times: [0.05182290077209473, 0.009740114212036133, 0.010071992874145508]
+Average time for n = 5000, 0.37594064076741535 seconds.
+Detailed times: [0.43782782554626465, 0.3420250415802002, 0.34796905517578125]
+Average time for n = 10000, 2.299429972966512 seconds.
+Detailed times: [2.2972328662872314, 2.3000130653381348, 2.30104398727417]
+Average time for n = 20000, 11.80897831916809 seconds.
+Detailed times: [11.800503015518188, 11.812551975250244, 11.81387996673584]
+Average time for n = 30000, 28.457079648971558 seconds.
+Detailed times: [28.232720851898193, 28.54995608329773, 28.58856201171875]
+
+
+Benchmark for kernel: Polynomial{Float32}(2.5f0, 1.0f0)
+times: [0.02387833595275879, 0.37594064076741535, 2.299429972966512, 11.80897831916809, 28.457079648971558]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Exponential{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Exponential{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Exponential{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Exponential{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Exponential{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Exponential{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Exponential{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.021087646484375 seconds.
+Detailed times: [0.04258084297180176, 0.010214090347290039, 0.010468006134033203]
+Average time for n = 5000, 0.34034093221028644 seconds.
+Detailed times: [0.32671380043029785, 0.3347458839416504, 0.35956311225891113]
+Average time for n = 10000, 2.3025460243225098 seconds.
+Detailed times: [2.31868314743042, 2.3052659034729004, 2.283689022064209]
+Average time for n = 20000, 11.6984916528066 seconds.
+Detailed times: [11.701003074645996, 11.681907892227173, 11.71256399154663]
+Average time for n = 30000, 27.309579372406006 seconds.
+Detailed times: [28.453377962112427, 26.77883005142212, 26.69653010368347]
+
+
+Benchmark for kernel: Exponential{Float32}(1.0f0)
+times: [0.021087646484375, 0.34034093221028644, 2.3025460243225098, 11.6984916528066, 27.309579372406006]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Log{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Log{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Log{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Log{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Log{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Log{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Log{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.6797040303548177 seconds.
+Detailed times: [0.672692060470581, 0.6773779392242432, 0.6890420913696289]
+Average time for n = 5000, 17.890639702479046 seconds.
+Detailed times: [17.43717098236084, 18.29522204399109, 17.939526081085205]
+Average time for n = 10000, 75.34783267974854 seconds.
+Detailed times: [72.00762915611267, 77.07103490829468, 76.96483397483826]
+Average time for n = 20000, 299.58002829551697 seconds.
+Detailed times: [287.51997089385986, 316.65273213386536, 294.5673818588257]
+Average time for n = 30000, 668.3192179997762 seconds.
+Detailed times: [615.7380468845367, 687.9990301132202, 701.2205770015717]
+
+
+Benchmark for kernel: Log{Float32}(3.0f0)
+times: [0.6797040303548177, 17.890639702479046, 75.34783267974854, 299.58002829551697, 668.3192179997762]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Cauchy{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Cauchy{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Cauchy{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Cauchy{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Cauchy{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Cauchy{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Cauchy{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.020550966262817383 seconds.
+Detailed times: [0.04257678985595703, 0.009579181671142578, 0.009496927261352539]
+Average time for n = 5000, 0.28831299146016437 seconds.
+Detailed times: [0.29817700386047363, 0.27698516845703125, 0.2897768020629883]
+Average time for n = 10000, 2.1037469704945884 seconds.
+Detailed times: [2.1125118732452393, 2.113284111022949, 2.085444927215576]
+Average time for n = 20000, 10.853879372278849 seconds.
+Detailed times: [10.831525087356567, 10.819321870803833, 10.910791158676147]
+Average time for n = 30000, 26.60598635673523 seconds.
+Detailed times: [26.610662937164307, 26.617422103881836, 26.589874029159546]
+
+
+Benchmark for kernel: Cauchy{Float32}(1.0f0)
+times: [0.020550966262817383, 0.28831299146016437, 2.1037469704945884, 10.853879372278849, 26.60598635673523]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Power{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Power{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Power{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Power{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Power{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Power{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Power{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.6786576906840006 seconds.
+Detailed times: [0.6616380214691162, 0.6892120838165283, 0.6851229667663574]
+Average time for n = 5000, 17.267266988754272 seconds.
+Detailed times: [16.51069688796997, 16.84246802330017, 18.448636054992676]
+Average time for n = 10000, 67.2765880425771 seconds.
+Detailed times: [66.81912612915039, 67.55816388130188, 67.45247411727905]
+Average time for n = 20000, 272.9499189853668 seconds.
+Detailed times: [256.9064929485321, 289.7352590560913, 272.20800495147705]
+Average time for n = 30000, 602.9276502927145 seconds.
+Detailed times: [631.3551018238068, 588.9203650951385, 588.507483959198]
+
+
+Benchmark for kernel: Power{Float32}(2.5f0)
+times: [0.6786576906840006, 17.267266988754272, 67.2765880425771, 272.9499189853668, 602.9276502927145]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Wave{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Wave{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Wave{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Wave{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Wave{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Wave{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Wave{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.05330530802408854 seconds.
+Detailed times: [0.13900995254516602, 0.01030111312866211, 0.0106048583984375]
+Average time for n = 5000, 0.36519455909729004 seconds.
+Detailed times: [0.4139838218688965, 0.34435486793518066, 0.33724498748779297]
+Average time for n = 10000, 2.3565756479899087 seconds.
+Detailed times: [2.358901023864746, 2.3174688816070557, 2.393357038497925]
+Average time for n = 20000, 12.435916662216187 seconds.
+Detailed times: [12.18673300743103, 12.518725872039795, 12.602291107177734]
+Average time for n = 30000, 30.515334685643513 seconds.
+Detailed times: [30.4481680393219, 30.57571315765381, 30.522122859954834]
+
+
+Benchmark for kernel: Wave{Float32}(1.0f0)
+times: [0.05330530802408854, 0.36519455909729004, 2.3565756479899087, 12.435916662216187, 30.515334685643513]
+Variables
+  #self#::Core.Compiler.Const(benchKernel, false)
+  Kernel::Sigmoid{Float32}
+  n::Array{Int64,1}
+  verbose::Bool
+  times::Array{Float64,1}
+
+Body::Tuple{Array{Int64,1},Array{Float64,1}}
+1 ─ %1  = Main.typeof(Kernel)::Core.Compiler.Const(Sigmoid{Float32}, false)
+│   %2  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %3  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 1)::Core.Compiler.Const(Array{Float32,1}, false)
+│   %4  = Core.tuple(%1, %2, %3)::Core.Compiler.Const((Sigmoid{Float32}, Array{Float32,1}, Array{Float32,1}), false)
+│         Main.precompile(Main.kernel, %4)
+│   %6  = Main.typeof(Kernel)::Core.Compiler.Const(Sigmoid{Float32}, false)
+│   %7  = Core.apply_type(Main.Array, $(Expr(:static_parameter, 1)), 2)::Core.Compiler.Const(Array{Float32,2}, false)
+│   %8  = Core.tuple(%6, %7)::Core.Compiler.Const((Sigmoid{Float32}, Array{Float32,2}), false)
+│         Main.precompile(Main.calculateKernelMatrix, %8)
+│   %10 = Main.typeof(Kernel)::Core.Compiler.Const(Sigmoid{Float32}, false)
+│   %11 = Core.apply_type(Main.Array, Main.Int64, 1)::Core.Compiler.Const(Array{Int64,1}, false)
+│   %12 = Core.tuple(%10, %11)::Core.Compiler.Const((Sigmoid{Float32}, Array{Int64,1}), false)
+│         Main.precompile(Main.bench, %12)
+│         (times = Main.bench(Kernel, n))
+└──       goto #3 if not verbose
+2 ─ %16 = Main.repr(Kernel)::String
+└──       Main.println("\n\nBenchmark for kernel: ", %16, "\ntimes: ", times)
+3 ┄ %18 = Core.tuple(n, times)::Tuple{Array{Int64,1},Array{Float64,1}}
+└──       return %18
+Average time for n = 1000, 0.020877997080485027 seconds.
+Detailed times: [0.04346203804016113, 0.009568929672241211, 0.009603023529052734]
+Average time for n = 5000, 0.34108901023864746 seconds.
+Detailed times: [0.338547945022583, 0.33887410163879395, 0.34584498405456543]
+Average time for n = 10000, 2.2474366823832193 seconds.
+Detailed times: [2.2487950325012207, 2.249634027481079, 2.2438809871673584]
+Average time for n = 20000, 11.53704031308492 seconds.
+Detailed times: [11.515943050384521, 11.543268918991089, 11.55190896987915]
+Average time for n = 30000, 27.285153945287068 seconds.
+Detailed times: [27.84670901298523, 27.27562689781189, 26.733125925064087]
+
+
+Benchmark for kernel: Sigmoid{Float32}(1.0f0, 1.0f0)
+times: [0.020877997080485027, 0.34108901023864746, 2.2474366823832193, 11.53704031308492, 27.285153945287068]
+	Command being timed: "julia script.jl"
+	User time (seconds): 50728.78
+	System time (seconds): 29.16
+	Percent of CPU this job got: 729%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:55:56
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 7499156
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 804
+	Minor (reclaiming a frame) page faults: 38020991
+	Voluntary context switches: 2672
+	Involuntary context switches: 325549
+	Swaps: 0
+	File system inputs: 368464
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+
