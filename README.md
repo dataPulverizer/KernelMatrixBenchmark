@@ -247,17 +247,17 @@ C interop is easy in all three languages; Chapel’s has good documentation but 
 
 All three languages have convenient places where users can ask questions. For Chapel, the easiest place is Gitter, for Julia it’s Discourse (though there is a Julia Gitter) and for D it’s the official website forum. The Julia community is the most active, followed by D and then Chapel. I’ve found that you’ll get good responses from all three communities but you’ll probably get quicker answers from D and Julia communities.
 
-|                             | Chapel        | D             | Julia    |
-| --------------------------- |:-------------:|:-------------:| --------:|
-| Compilation/Interactivty    | Slow          | Fast          | Best     |
-| Documentation & Examples    | Detailed      | Patchy        | Best     |
-| Multi-dimensional Arrays    | Yes           | Native Only   | Yes      |
-| Language Power              | Good          | Great         | Best     |
-| Concurrency & Parallelism   | Great         | Great         | Good     |
-| Standard Library            | Good          | Great         | Great    |
-| Package Manager & Ecosystem | Nascent       | Best          | Great    |
-| C Integration               | Great         | Great         | Great    |
-| Community                   | Small         | Vibrant       | Largest  |
+|                             | Chapel        | D                                   | Julia    |
+| --------------------------- |:-------------:|:-----------------------------------:| --------:|
+| Compilation/Interactivty    | Slow          | Fast                                | Best     |
+| Documentation & Examples    | Detailed      | Patchy                              | Best     |
+| Multi-dimensional Arrays    | Yes           | Native Only <br>(library support)   | Yes      |
+| Language Power              | Good          | Great                               | Best     |
+| Concurrency & Parallelism   | Great         | Great                               | Good     |
+| Standard Library            | Good          | Great                               | Great    |
+| Package Manager & Ecosystem | Nascent       | Best                                | Great    |
+| C Integration               | Great         | Great                               | Great    |
+| Community                   | Small         | Vibrant                             | Largest  |
 
 Table for quality of life features in Chapel, D & Julia
 
