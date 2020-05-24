@@ -46,7 +46,7 @@ function runKernelBenchmarks(kernels::NTuple{N, AbstractKernel{T}}, n::Array{Int
   return results
 end
 
-function main(::Type{T}) where {T}
+function main(::Type{T}, verbose::Bool = true) where {T}
   n = [1000, 5000 , 10_000, 20_000, 30_000];
   
   kernels = (DotProduct{T}(),   Gaussian{T}(1), Polynomial{T}(2.5, 1),
@@ -55,7 +55,7 @@ function main(::Type{T}) where {T}
   kernelNames = ["DotProduct",  "Gaussian", "Polynomial",
                  "Exponential", "Log",      "Cauchy",
                  "Power",       "Wave",     "Sigmoid"];
-  outputs = runKernelBenchmarks(kernels, n)
+  outputs = runKernelBenchmarks(kernels, n, verbose)
   
   table = Array{String, 2}(undef, (length(n)*length(kernels) + 1, 4))
   table[1, :] = ["language", "kernel", "nitems", "time"]
