@@ -104,7 +104,7 @@ end
   @inbounds @simd for i in 1:m
     dist += abs(x[i] - y[i])
   end
-  tmp = theta/dist;
+  tmp = K.theta/dist;
   return tmp*sin(1/tmp);
 end
 
