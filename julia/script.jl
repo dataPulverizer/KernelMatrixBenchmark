@@ -22,7 +22,7 @@ function bench(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = tr
   return times
 end
 
-function benchKernel(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = true) where {T}
+function precompileKernel(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = true) where {T}
   precompile(kernel, (typeof(Kernel), Array{T, 1}, Array{T, 1}))
   precompile(calculateKernelMatrix, (typeof(Kernel), Array{T, 2}))
   precompile(bench, (typeof(Kernel), Array{Int64, 1}))
@@ -38,10 +38,10 @@ end
 function runKernelBenchmarks(kernels::NTuple{N, AbstractKernel{T}}, n::Array{Int64, 1}, verbose::Bool = true) where {N, T}
   results = Array{Tuple{Array{Int64, 1}, Array{Float64, 1}}, 1}(undef, length(kernels))
   for i in 1:length(results)
-    if verbose # to check types are known at compililation
-      @code_warntype benchKernel(kernels[i], n, verbose)
+    if verbose # to check types are known at compilation
+      @code_warntype precompileKernel(kernels[i], n, verbose)
     end
-    results[i] = benchKernel(kernels[i], n, verbose)
+    results[i] = precompileKernel(kernels[i], n, verbose)
   end
   return results
 end
@@ -85,4 +85,3 @@ end
   /usr/bin/time -v julia script.jl
 =#
 main(Float32)
-
