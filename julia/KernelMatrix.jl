@@ -50,7 +50,7 @@ end
   dist::T = T(0)
   m = length(x)
   @inbounds @simd for i in 1:m
-    dist::T -= abs(x[i] - y[i])
+    dist -= abs(x[i] - y[i])
   end
   return exp(dist/K.theta)
 end
@@ -60,11 +60,9 @@ struct Log{T} <: AbstractKernel{T}
 end
 @inline function kernel(K::Log{T}, x::AbstractArray{T, N}, y::AbstractArray{T, N}) where {T, N}
   dist::T = T(0)
-  tmp::T = T(0)
   m = length(x)
   @inbounds @simd for i in 1:m
-    tmp = abs(x[i] - y[i])^K.beta
-    dist += tmp
+    dist += abs(x[i] - y[i])^K.beta
   end
   dist ^= (1/K.beta)
   return -log(1 + dist)
@@ -90,11 +88,9 @@ struct Power{T} <: AbstractKernel{T}
 end
 @inline function kernel(K::Power{T}, x::AbstractArray{T, N}, y::AbstractArray{T, N}) where {T, N}
   dist::T = T(0)
-  tmp::T = T(0)
   m = length(x)
   @inbounds @simd for i in 1:m
-    tmp = abs(x[i] - y[i])^K.beta
-    dist += tmp
+    dist += abs(x[i] - y[i])^K.beta
   end
   return -dist^(1/K.beta)
 end
@@ -108,7 +104,8 @@ end
   @inbounds @simd for i in 1:m
     dist += abs(x[i] - y[i])
   end
-  return (K.theta/(dist))*sin(dist/K.theta)
+  tmp = theta/dist;
+  return tmp*sin(1/tmp);
 end
 
 struct Sigmoid{T} <: AbstractKernel{T}
