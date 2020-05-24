@@ -70,7 +70,7 @@ function main(::Type{T}, verbose::Bool = true) where {T}
         k += 1
       end
     end
-    if k > size(table)[2]
+    if k > size(table)[1]
       break
     end
   end
