@@ -171,7 +171,7 @@ The process of performance optimization in all three languages was very differen
 
 In terms of language specific issues, getting to performant code in Chapel was by far the most challenging and the Chapel code changed the most from easy to read array operations to using pointers and guided iterations. But on the compiler side it was relatively easy to add `--fast` and get a very large optimization boost.
 
-In D the code changed very little and most of the performance was gained in compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 different `-O` optimization levels and a myriad of other flags that affect performance in various ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing aggressive compiler optimizations, bounds checking, and LLVM’s fast-math.
+In D the code changed very little and most of the performance was gained in compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 `-O` optimization levels but some are repetitions of others for instance `-O`, `-O3`, and `-O5` are identical, and there are a myriad of other flags that affect performance in various ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing aggressive compiler optimizations, bounds checking, and LLVM’s fast-math.
 
 In the Julia the macro changes discussed previously markedly improved the performance but they were not too intrusive. I tried changing the optimization `-O` level but this did not improve performance.
 
