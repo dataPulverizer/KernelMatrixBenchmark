@@ -1,135 +1,218 @@
 import arrays;
+import math;
 import std.parallelism;
 import std.range : iota;
-import std.math: exp, sqrt, tanh;
 import std.stdio: writeln;
 import std.datetime.stopwatch: AutoStart, StopWatch;
 
-/*
-  Reference for Kernel functions
-  http://crsouza.com/2010/03/17/kernel-functions-for-machine-learning-applications/
+/**
+  Kernel Function Types:
 */
-interface AbstractKernel(T){
-  T opCall(T[] x, T[] y) const;
-}
-
-class DotProduct(T): AbstractKernel!(T)
+struct DotProduct(T)
 {
-  @nogc:
   public:
+  this(T _nothing)
+  {}
   T opCall(T[] x, T[] y) const
   {
-    //assert(x.length == y.length, "x and y are not the same length.");
-    T ret = 0;
-    foreach(long i; 0..x.length)
+    T dist = 0;
+    auto m = x.length;
+    for(size_t i = 0; i < m; ++i)
     {
-      ret += x[i]*y[i];
+      dist += x[i] * y[i];
     }
-    return ret;
+    return dist;
   }
 }
 
-class Polynomial(T): AbstractKernel!(T)
+struct Gaussian(T)
 {
-  @nogc:
   private:
-  T d;
+    T theta;
   public:
-  T opCall(T[] x, T[] y) const
-  {
-    //assert(x.length == y.length, "x and y are not the same length.");
-    T ret = 0;
-    for(long i = 0; i < x.length; ++i)
+    this(T _theta)
     {
-      ret += x[i]*y[i];
+      theta = _theta;
     }
-    return (ret + 1)^^d;
-  }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        auto tmp = x[i] - y[i];
+        dist += tmp * tmp;
+      }
+      return exp(-sqrt(dist)/theta);
+    }
 }
 
-class Gaussian(T): AbstractKernel!(T)
+struct Polynomial(T)
 {
-  @nogc:
   private:
-  T gamma;
+    T d;
+    T offset;
   public:
-  this(T _gamma)
-  {
-    gamma = _gamma;
-  }
-  T opCall(T[] x, T[] y) const
-  {
-    //assert(x.length == y.length, "x and y are not the same length.");
-    T ret = 0;
-    for(long i = 0; i < x.length; ++i)
+    this(T _d, T _offset)
     {
-      auto tmp = x[i] - y[i];
-      ret += tmp*tmp;
+      d = _d;
+      offset = _offset;
     }
-    return exp(-ret*gamma);
-  }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        dist += x[i] * y[i];
+      }
+      return pow(dist + offset, d);
+    }
 }
 
-
-class Laplace(T): AbstractKernel!(T)
+struct Exponential(T)
 {
-  @nogc:
   private:
-  T sigma;
+    T theta;
   public:
-  this(T _sigma)
-  {
-    sigma = _sigma;
-  }
-  T opCall(T[] x, T[] y) const
-  {
-    //assert(x.length == y.length, "x and y are not the same length.");
-    T ret = 0;
-    for(long i = 0; i < x.length; ++i)
+    this(T _theta)
     {
-      auto tmp = x[i] - y[i];
-      ret += tmp*tmp;
+      theta = _theta;
     }
-    ret = sqrt(ret);
-    return exp(-ret/sigma);
-  }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        dist -= abs(x[i] - y[i]);
+      }
+      return exp(dist/theta);
+    }
 }
 
-
-class HyperbolicTan(T): AbstractKernel!(T)
+struct Log(T)
 {
-  @nogc:
   private:
-  T alpha;
-  T c;
+    T beta;
   public:
-  this(_alpha, _c)
-  {
-    alpha =  _alpha; c = _c;
-  }
-  T opCall(T[] x, T[] y) const
-  {
-    //assert(x.length == y.length, "x and y are not the same length.");
-    T ret = 0;
-    for(long i = 0; i < x.length; ++i)
+    this(T _beta)
     {
-      ret += x[i]*y[i];
+      beta = _beta;
     }
-    ret *= alpha;
-    ret += c;
-    return tanh(ret);
-  }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        dist += pow(abs(x[i] - y[i]), beta);
+      }
+      dist = pow(dist, 1/beta);
+      return -log(1 + dist);
+    }
 }
+
+struct Cauchy(T)
+{
+  private:
+    T theta;
+  public:
+    this(T _theta)
+    {
+      theta = _theta;
+    }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        auto tmp = x[i] - y[i];
+        dist += tmp * tmp;
+      }
+      dist = sqrt(dist)/theta;
+      return 1/(1 + dist);
+    }
+}
+
+struct Power(T)
+{
+  private:
+    T beta;
+  public:
+    this(T _beta)
+    {
+      beta = _beta;
+    }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        dist += pow(abs(x[i] - y[i]), beta);
+      }
+      return -pow(dist, 1/beta);
+    }
+}
+
+struct Wave(T)
+{
+  private:
+    T theta;
+  public:
+    this(T _theta)
+    {
+      theta = _theta;
+    }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        dist += abs(x[i] - y[i]);
+      }
+      auto tmp = theta/dist;
+      return tmp*sin(1/tmp);
+    }
+}
+
+struct Sigmoid(T)
+{
+  private:
+    T beta0;
+    T beta1;
+  public:
+    this(T _beta0, T _beta1)
+    {
+      beta0 = _beta0;
+      beta1 = _beta1;
+    }
+    T opCall(T[] x, T[] y) const
+    {
+      T dist = 0;
+      auto m = x.length;
+      for(size_t i = 0; i < m; ++i)
+      {
+        dist += x[i] * y[i];
+      }
+      return tanh(beta0 * dist + beta1);
+    }
+}
+
+/************************************************************************************/
 
 auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
 {
-  long n = data.ncol;
+  size_t n = data.ncol;
   auto mat = Matrix!(T)(n, n);
 
   foreach(j; taskPool.parallel(iota(n)))
   {
     auto arrj = data.refColumnSelect(j).array;
-    foreach(long i; j..n)
+    foreach(size_t i; j..n)
     {
       mat[i, j] = kernel(data.refColumnSelect(i).array, arrj);
       mat[j, i] = mat[i, j];
@@ -137,6 +220,3 @@ auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
   }
   return mat;
 }
-
-
-
