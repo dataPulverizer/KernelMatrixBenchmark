@@ -11,7 +11,7 @@ Kernel matrix calculations form the basis of kernel methods in machine learning 
 While preparing the code for this article, the Chapel, D, and Julia communities were very helpful and patient with all enquiries, so they are acknowledged here.
 
 ## Language Benchmarks for Kernel Matrix Calculation
-<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg" width="600">
+<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg" width="700">
 
 |     n |         D |      Julia |    Chapel |
 | ----- |:---------:|:----------:| ---------:|
