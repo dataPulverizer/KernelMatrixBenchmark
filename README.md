@@ -13,16 +13,6 @@ While preparing the code for this article, the Chapel, D, and Julia communities 
 ## Language Benchmarks for Kernel Matrix Calculation
 <img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg" width="700">
 
-|     n |         D |      Julia |    Chapel |
-| ----- |:---------:|:----------:| ---------:|
-|  1000 |  0.0094   |  0.0105    |  0.0403   |
-|  5000 |  0.2711   |  0.3133    |  0.9783   |
-| 10000 |  1.4359   |  2.1713    |  3.8594   |
-| 20000 | 11.2670   | 11.1537    | 16.7087   |
-| 30000 | 31.0559   | 29.2007    | 40.2499   |
-
-Table shows the average execution times (seconds) for each language for varying number of items (n) (Dot kernel).
-
 ## Environment
 
 The code was run on a computer with an Ubuntu 20.04 OS, 32 GB memory and an Intel® Core™ i9-8950HK CPU @ 2.90GHz with 6 cores and 12 threads.
