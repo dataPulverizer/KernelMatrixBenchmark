@@ -1,0 +1,20 @@
+{
+	"authors": [
+		"Dr Chibisi Chima-Okereke"
+	],
+	"copyright": "Copyright © 2020, Dr Chibisi Chima-Okereke",
+	"dependencies": {
+		"mir-algorithm": "~>3.8.12",
+		"mir-random": "~>2.2.14"
+	},
+	"description": "Kernel Matrix Calculations using D's Mir Algorithm Package",
+	"license": "MIT",
+	"name": "ndslice",
+	"dflags": ["--boundscheck=off", "--ffast-math", "-mcpu=native"],
+	"toolchainRequirements": {
+		"dmd": ">=2.090.1",
+		"gdc": "no",
+		"ldc2": ">=1.18.0"
+	},
+	"targetType": "executable"
+}
