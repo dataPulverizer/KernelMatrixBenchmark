@@ -1,17 +1,26 @@
 # A look at Chapel, D, and Julia using Kernel Matrix calculations
 
+*Author: Dr Chibisi Chima-Okereke*
 *Date: 2020-05-22*
 
 ## Introduction
 
-It seems each time you turn around there is a new programming language aimed at solving some specific problem set. Increased proliferation of programming languages and data are deeply connected in a fundamental way and increasing demand for “data science” computing is a related phenomenon. In the field of scientific computing Chapel, D, and Julia  are highly relevant programming languages. They arise from different needs and are aimed at different problem sets. Chapel focuses on data parallelism on single multicore machines and large clusters, D initially was developed as a more productive safer alternative to C++ and Julia was developed for technical and scientific computing and aimed at getting the best of both worlds from static programming languages which have high performance and safety with the flexibility of dynamic programming languages, however they all emphasize performance as a feature. In this article, we look at how their performance varies over kernel matrix calculations, and present approaches to performance optimization and other usability features of the languages.
+It seems each time you turn around there is a new programming language aimed at solving some specific problem set. Increased proliferation of programming languages and data are deeply connected in a fundamental way and increasing demand for “data science” computing is a related phenomenon. In the field of scientific computing Chapel, D, and Julia  are highly relevant programming languages, they arise from different needs and are aimed at different problem sets. Chapel focuses on data parallelism on single multicore machines and large clusters, D was initially developed as a more productive safer alternative to C++ and Julia was developed for technical and scientific computing and aimed at getting the best of both worlds from static programming languages which have high performance and safety with the flexibility of dynamic programming languages, however they all emphasize performance as a feature. In this article, we look at how their performance varies over kernel matrix calculations and present approaches to performance optimization and other usability features of the languages.
 
-Kernel matrix calculations form the basis of kernel methods in machine learning applications. They scale rather poorly `O(m n^2)`, `n` is the number of items and `m` is the number of elements in each item. In our exercsie `m` will be constant and we will be looking at execution time in each implementation as `n` increases. Here `m = 784`, and `n = 1k, 5k, 10k, 20k, 30k`, each calculation is run 3 times and an average is taken. We disallow any use of BLAS and only allow use of packages or modules from the standard library of each language. The details for the calculation of the kernel matrix and kernel functions are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/docs/kernel.pdf).
+Kernel matrix calculations form the basis of kernel methods in machine learning applications. They scale rather poorly `O(m n^2)`, `n` is the number of items and `m` is the number of elements in each item. In our exercsie `m` will be constant and we will be looking at execution time in each implementation as `n` increases. Here `m = 784`, and `n = 1k, 5k, 10k, 20k, 30k`, each calculation is run 3 times and an average is taken. We disallow any use of BLAS and only allow use of packages or modules from the standard library of each language - though in the case of D the benchmark is compared with calculations using Mir, a multidimensional array package to make sure that my implementation of matrix reflects the true performance of D. The details for the calculation of the kernel matrix and kernel functions are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/docs/kernel.pdf).
 
 While preparing the code for this article, the Chapel, D, and Julia communities were very helpful and patient with all enquiries, so they are acknowledged here.
 
+In terms of bias going in I was much more familiar with D and Julia than I was of Chapel, however getting the best performance from each language requried a lot of interaction with each programming community and I have done my best to be aware of my biases and correct for them where necessary.
+
 ## Language Benchmarks for Kernel Matrix Calculation
 <img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg" width="700">
+
+The above chart shows the performance benchmark time taken against the number of items `n` for Chapel, D Julia, for nine kernels. D performs best in 5 of the 9 kernels, Julia performs best in 2 of the nine kernels and in two of the kernels (Dot and Gaussian) the picture is mixed. It is worth noting that the mathematics functions used in D were pulled from C's math module made available in D in its `core.stdc.math` module because the mathematical functions in D's standard library can be quite slow see [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d) for more details. Even then the benchmark shows that D's log function is still slow in comparison to Julia's. Chapel was the slowest for all the kernel functions examined.
+
+The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows matrix implementation times minus ndslice times, negative means that ndslice is slower meaning that the implementation used here does not negatively represent D's performance.
+
+<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/ndsliceDiagnostic.jpg" width="500">
 
 ## Environment
 
@@ -47,7 +56,7 @@ chpl script.chpl kernelmatrix.chpl --fast && ./script
 
 D
 ```
-ldc2 script.d kernelmatrix.d arrays.d -O5 --boundscheck=off --ffast-math && ./script
+ldc2 script.d kernelmatrix.d arrays.d -O5 --boundscheck=off --ffast-math -mcpu=native && ./script
 ```
 
 Julia - no compilation required but can be run from command line:
@@ -57,7 +66,7 @@ julia script.jl
 
 ## Implementations 
 
-Efforts were made to avoid non standard libraries while implementing these kernel functions. The reasons for this are:
+Efforts were made to avoid non-standard libraries while implementing these kernel functions. The reasons for this are:
 
 * Making it easy for a reader after installing the language to copy and run the code. Having to install external libraries can be a bit of a "faff".
 * Packages outside standard libraries can go extinct so avoiding external libraries keeps the article and code relevant.
@@ -92,7 +101,7 @@ Chapel code was the most difficult to optimise for performance and required the 
 
 ### D
 
-D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the benefit came from the compiler used and flags selected (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
+D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the performance benefits came from the specific compiler used and flags selected (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
 
 ```
 auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
@@ -149,19 +158,107 @@ end
 
 These optimizations are quite visible but very easy to apply.
 
+## Memory Usage
+
+The total time for each benchmark and memory used was captured using the `/usr/bin/time -v` command. The output for each of the languages is given below:
+
+Chapel took the longest total time but consumed the least amount of memory (nearly 6GB RAM peak memory):
+```
+	Command being timed: "./script"
+	User time (seconds): 113190.32
+	System time (seconds): 6.57
+	Percent of CPU this job got: 1196%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:37:39
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 5761116
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1439306
+	Voluntary context switches: 653
+	Involuntary context switches: 1374820
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+```
+
+D consumed the most amount of memory (around 20GB RAM peak memory) but took less total time than Chapel to execute:
+
+```
+	Command being timed: "./script"
+	User time (seconds): 106065.71
+	System time (seconds): 58.56
+	Percent of CPU this job got: 1191%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:28:29
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 20578840
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 18249033
+	Voluntary context switches: 3833
+	Involuntary context switches: 1782832
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+```
+
+Julia consumed a moderate amount of memory (around 7.5 GB peak memory) but ran the quickest - probably because it's random number generator is the fastest:
+
+```
+	Command being timed: "julia script.jl"
+	User time (seconds): 49794.85
+	System time (seconds): 30.58
+	Percent of CPU this job got: 726%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:54:18
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 7496184
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 794
+	Minor (reclaiming a frame) page faults: 38019472
+	Voluntary context switches: 2629
+	Involuntary context switches: 523063
+	Swaps: 0
+	File system inputs: 368360
+	File system outputs: 8
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0
+```
+
 ## Performance optimization
 
 The process of performance optimization in all three languages was very different and all three communities were very helpful in the process. But there were some common themes.
 
-* Static dispatching of kernel functions instead of using polymorphism. This means that when passing the kernel function, use parametric (static compile time) polymorphism rather than runtime (dynamic) polymorphism were dispatch with virtual functions carries a performance penalty. In this case it made little or no difference.
+* Static dispatching of kernel functions instead of using polymorphism. This means that when passing the kernel function, use parametric (static compile time) polymorphism rather than runtime (dynamic) polymorphism were dispatch with virtual functions carries a performance penalty.
 * Using views/references rather than copying data over multiple threads – makes a big difference.
-* Parallelising the calculations – makes a huge difference.
+* Parallelising the calculations makes a huge difference.
 * Knowing if your array is row/column major and using that in your calculation makes a huge difference.
-* Bounds checks and compiler optimizations – makes a huge difference especially in Chapel and D.
+* Bounds checks and compiler optimizations makes a huge difference especially in Chapel and D.
+* Enabling SIMD in D and Julia made a contribution to the performance. In D this was done using the `-mcpu=native` flag and in Julia this was done using the `@simd` macro.
 
-In terms of language specific issues, getting to performant code in Chapel was by far the most challenging and the Chapel code changed the most from easy to read array operations to using pointers and guided iterations. But on the compiler side it was relatively easy to add `--fast` and get a very large optimization boost.
+In terms of language specific issues, getting to performant code in Chapel was the most challenging and the Chapel code changed the most from easy to read array operations to using pointers and guided iterations. But on the compiler side it was relatively easy to add `--fast` and get a large performance boost.
 
-In D the code changed very little and most of the performance was gained in compiler optimizations. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 `-O` optimization levels but some are repetitions of others for instance `-O`, `-O3`, and `-O5` are identical, and there are a myriad of other flags that affect performance in various ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing aggressive compiler optimizations, bounds checking, and LLVM’s fast-math.
+In D the code changed very little and most of the performance was gained in the compiler used and optimization flags. D’s LDC compiler is rich in terms of options for performance optimization. It has 8 `-O` optimization levels but some are repetitions of others for instance `-O`, `-O3`, and `-O5` are identical, and there are a myriad of other flags that affect performance in various ways. In this case the flags used were `-O5 --boundscheck=off –ffast-math` representing aggressive compiler optimizations, bounds checking, and LLVM’s fast-math and `-mcpu=native` to enable CPU vectorization instructions.
 
 In the Julia the macro changes discussed previously markedly improved the performance but they were not too intrusive. I tried changing the optimization `-O` level but this did not improve performance.
 
@@ -215,11 +312,9 @@ Nowadays new languages tout support for concurrency and it’s popular subset pa
 
 Chapel’s concurrency model has much more emphasis on data parallelism but has tools for task parallelism and ships with support for cluster-based concurrency.
 
-Julia has good support for both concurrency and parallelism, but consumes the most system resources in terms of memory out of the three when running processes in parallel.
+Julia has good support for both concurrency and parallelism.
 
-D has industry strength support for parallelism and concurrency, it’s the most efficient from a memory and execution point of view, each thread in D will usually use the least memory out of the three – though its support for threading is much less well documented with examples.
-
-Given the choice of writing parallel code in Chapel, D, and Julia, you could get more out of your system resources using D, then Chapel, and finally Julia – though this is a separate issue from execution times.
+D has industry strength support for parallelism and concurrency, though its support for threading is much less well documented with examples.
 
 ### Standard Library
 
@@ -255,4 +350,4 @@ Table for quality of life features in Chapel, D & Julia
 
 If you are a novice programmer writing numerical algorithms and doing calculations based in scientific computing and want a fast language that's easy to use Julia is your best bet. If you are an experienced programmer working in the same space Julia is still a great option. If you specifically want a more conventional "industrial strength" static compiled high performance language with all the "bells and whistles" but want something more productive, safer and less painful than C++ then D is your best bet. You can write "anything" in D and get great performance from its compilers. If you need to get array calculations happening on clusters then Chapel is probably the easiest place to go.
 
-In terms of raw performance on this task Julia was the winner for the larger data object with D a very close second but D was the best for smaller data sizes - but both are  *very* close, my feeling is that adding SIMD support to my matrix object could put D ahead or on par with Julia at the larger data size. This exercise reveals that Julia's label as a high performance language is more than just hype, it has held it's own against highly competitve languages. It was hard to get competitve performance from Chapel which I did not expect - it took a lot of investigation from the Chapel team to come up with the current solution, however it is early in the development of this language and we should look forward to further improvements.
+In terms of raw performance on this task D was the winner clearly performing better in 5 out of the 9 kernels benchmarked. This exercise reveals that Julia's label as a high performance language is more than just hype, it has held it's own against highly competitve languages. It was hard to get competitve performance from Chapel which I did not expect - it took a lot of investigation from the Chapel team to come up with the current solution, however as the Chapel language matures we could see further improvement.
