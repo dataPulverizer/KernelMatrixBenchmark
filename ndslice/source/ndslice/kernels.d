@@ -1,14 +1,10 @@
 module ndslice.kernels;
-import ndslice.math;
-
-import mir.ndslice.slice;
-import mir.ndslice.allocation;
-import mir.ndslice.topology: iota;
+import core.stdc.tgmath: tanh;
+import mir.algorithm.iteration;
+import mir.math.common;
+import mir.ndslice;
 
 import std.parallelism;
-//import std.range : iota;
-//import std.stdio: writeln;
-//import std.datetime.stopwatch: AutoStart, StopWatch;
 
 /**
   Kernel Function Types:
@@ -18,7 +14,7 @@ struct DotProduct(T)
   public:
   this(T _nothing)
   {}
-  T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+  T opCall(Slice!(T*) x, Slice!(T*) y) const
   {
     T dist = 0;
     auto m = x.length;
@@ -39,7 +35,7 @@ struct Gaussian(T)
     {
       theta = _theta;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
@@ -63,7 +59,7 @@ struct Polynomial(T)
       d = _d;
       offset = _offset;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
@@ -84,13 +80,13 @@ struct Exponential(T)
     {
       theta = _theta;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist -= abs(x[i] - y[i]);
+        dist -= fabs(x[i] - y[i]);
       }
       return exp(dist/theta);
     }
@@ -105,13 +101,13 @@ struct Log(T)
     {
       beta = _beta;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist += pow(abs(x[i] - y[i]), beta);
+        dist += pow(fabs(x[i] - y[i]), beta);
       }
       dist = pow(dist, 1/beta);
       return -log(1 + dist);
@@ -127,7 +123,7 @@ struct Cauchy(T)
     {
       theta = _theta;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
@@ -150,13 +146,13 @@ struct Power(T)
     {
       beta = _beta;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist += pow(abs(x[i] - y[i]), beta);
+        dist += pow(fabs(x[i] - y[i]), beta);
       }
       return -pow(dist, 1/beta);
     }
@@ -171,13 +167,13 @@ struct Wave(T)
     {
       theta = _theta;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist += abs(x[i] - y[i]);
+        dist += fabs(x[i] - y[i]);
       }
       auto tmp = theta/dist;
       return tmp*sin(1/tmp);
@@ -195,7 +191,7 @@ struct Sigmoid(T)
       beta0 = _beta0;
       beta1 = _beta1;
     }
-    T opCall(U...)(Slice!(T*, U) x, Slice!(T*, U) y) const
+    T opCall(Slice!(T*) x, Slice!(T*) y) const
     {
       T dist = 0;
       auto m = x.length;
@@ -209,19 +205,12 @@ struct Sigmoid(T)
 
 /************************************************************************************/
 
-auto calculateKernelMatrix(alias K, T, U...)(K!(T) kernel, Slice!(T*, U) data)
+auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Slice!(T*, 2) data)
 {
   size_t n = data.length!0;
-  auto mat = slice!(T)(n, n);
-
-  foreach(j; taskPool.parallel(iota(n)))
-  {
-    auto arrj = data[j, 0..$];
-    foreach(size_t i; j..n)
-    {
-      mat[i, j] = kernel(data[i, 0..$], arrj);
-      mat[j, i] = mat[i, j];
-    }
-  }
+  auto mat = uninitSlice!(T)(n, n);
+  foreach(j, arrj; taskPool.parallel(data))
+    foreach (i; j .. n)
+      mat[j, i] = mat[i, j] = kernel(data[i], arrj);
   return mat;
 }
