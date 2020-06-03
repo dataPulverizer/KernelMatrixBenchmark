@@ -14,7 +14,7 @@ While preparing the code for this article, the Chapel, D, and Julia communities 
 In terms of bias going in I was much more familiar with D and Julia than I was of Chapel, however getting the best performance from each language requried a lot of interaction with each programming community and I have done my best to be aware of my biases and correct for them where necessary.
 
 ## Language Benchmarks for Kernel Matrix Calculation
-<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg" width="700">
+<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/benchplot.jpg" width="800">
 
 The above chart (generated using R's ggplot2 using a [script](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/charts.r)) shows the performance benchmark time taken against the number of items `n` for Chapel, D Julia, for nine kernels. D performs best in 5 of the 9 kernels, Julia performs best in 2 of the nine kernels and in two of the kernels (Dot and Gaussian) the picture is mixed. Chapel was the slowest for all the kernel functions examined.
 
@@ -28,7 +28,7 @@ Time taken for d log: 2.30737 seconds.
 
 The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times in equivalent between my implementation of a matrix and ndslice as a percentage of my matrix running time, negative means that ndslice is slower and positive times mean that ndslice is faster. Across the board ndslice is broadly slightly slower (remember that times at the smallest data sizes 5k-10k are very quick anyway) apart from in the case of `log` and `power` kernel where ndslice's times are *much faster*, the difference is just 40% across all sizes and since those particular kernels consume the most amount of time ndslice benchmarks ended up runing in about 1hr 31mins rather than 1hrs 54mins for Julia, 2hrs 28mins for D and 2 hrs 38 mins for Chapel. Why is this? It occurs because ndslice gets its math functions from [`LDC_intrinsic`](https://github.com/libmir/mir-core/blob/master/source/mir/math/common.d#L148) which is a protocol in D's LDC compiler that ["provides access to LLVM's built-in intrinsic functions"](https://wiki.dlang.org/LDC-specific_language_changes#LDC_intrinsic), which underlines the effect of selecting suitable functions.
 
-<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/ndsliceDiagnostic.jpg" width="500">
+<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/ndsliceDiagnostic.jpg" width="800">
 
 ## Environment
 
