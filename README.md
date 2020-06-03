@@ -1,7 +1,7 @@
 # A look at Chapel, D, and Julia using Kernel Matrix calculations
 
 *Author: Dr Chibisi Chima-Okereke*<br>
-*Date: 2020-05-22*
+*Date: 2020-06-04*
 
 ## Introduction
 
@@ -26,7 +26,7 @@ Time taken for c log: 0.324789 seconds.
 Time taken for d log: 2.30737 seconds.
 ```
 
-The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows matrix implementation times minus ndslice times, negative means that ndslice is slower meaning that the implementation used here does not negatively represent D's performance.
+The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times in equivalent between my implementation of a matrix and ndslice as a percentage of my matrix running time, negative means that ndslice is slower and positive times mean that ndslice is faster. Across the board ndslice is broadly slightly slower (remember that times at the smallest data sizes 5k-10k are very quick anyway) apart from in the case of `log` and `power` kernel where ndslice's times are *much faster*, the difference is just 40% across all sizes and since those particular kernels consume the most amount of time ndslice benchmarks ended up runing in about 1hr 31mins rather than 1hrs 54mins for Julia, 2hrs 28mins for D and 2 hrs 38 mins for Chapel. Why is this? It occurs because ndslice gets its math functions from [`LDC_intrinsic`](https://github.com/libmir/mir-core/blob/master/source/mir/math/common.d#L148) which is a protocol in D's LDC compiler that ["provides access to LLVM's built-in intrinsic functions"](https://wiki.dlang.org/LDC-specific_language_changes#LDC_intrinsic), which underlines the effect of selecting suitable functions.
 
 <img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/ndsliceDiagnostic.jpg" width="500">
 
@@ -225,7 +225,7 @@ D consumed the most amount of memory (around 20GB RAM peak memory) but took less
 	Exit status: 0
 ```
 
-Julia consumed a moderate amount of memory (around 7.5 GB peak memory) but ran the quickest - probably because it's random number generator is the fastest:
+Julia consumed a moderate amount of memory (around 7.5 GB peak memory) but ran the quickest - because the functions used in it's log and power kernels were more efficient than the functions used in the log and power kernel functions in D and Chapel:
 
 ```
 	Command being timed: "julia script.jl"
