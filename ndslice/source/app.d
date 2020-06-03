@@ -1,17 +1,15 @@
 import ndslice.kernels;
 
-import mir.ndslice.slice;
-import mir.ndslice.allocation;
-import mir.ndslice.topology: iota;
+import mir.math.sum;
+import mir.ndslice;
 import mir.random.algorithm: randomSlice;
 import mir.random.variable: UniformVariable;
 
 import std.conv: to;
+import std.datetime.stopwatch: AutoStart, StopWatch;
 import std.meta: AliasSeq;
-import std.algorithm : sum;
 import std.stdio: File, writeln;
 import std.typecons: tuple, Tuple;
-import std.datetime.stopwatch: AutoStart, StopWatch;
 
 /**
   To compile:
@@ -34,7 +32,7 @@ auto bench(alias K, T)(K!(T) kernel, long[] n, bool verbose = true)
       t = sw.peek.total!"nsecs"/1000_000_000.0;
       sw.reset();
     }
-    times[i] = sum(_times[])/3.0;
+    times[i] = sum!"naive"(_times[])/3.0;
     if(verbose)
     {
       writeln("Average time for n = ", n[i], ", ", times[i], " seconds.");

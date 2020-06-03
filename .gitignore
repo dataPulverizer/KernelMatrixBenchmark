@@ -1,0 +1,6 @@
+*.o
+*/.dub
+ndslice/ndslice
+d/mathdemo
+d/script
+ndslice/dub.selections.json
