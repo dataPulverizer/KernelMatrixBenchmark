@@ -21,7 +21,7 @@ The above chart (generated using R's ggplot2 using a [script](https://github.com
 It is worth noting that the mathematics functions used in D were pulled from C's math module made available in D in its `core.stdc.math` module because the mathematical functions in D's standard library [`std.math`](https://dlang.org/phobos/std_math.html) can be quite slow see, the math functions used are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d). By way of comparison consider the [mathdemo.d](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/mathdemo.d) script comparing the imported C `log` function D's log function from `std.math`:
 
 ```
-$ ldc2 -O --boundscheck=off --ffast-math --mcpu=native --boundscheck=off mathdemo.d && ./mathdemo
+$ ldc2 -O --boundscheck=off --ffast-math --mcpu=native mathdemo.d && ./mathdemo
 Time taken for c log: 0.324789 seconds.
 Time taken for d log: 2.30737 seconds.
 ```
