@@ -21,9 +21,9 @@ In terms of bias, going in I was much more familiar with D and Julia than I was 
 The [above chart](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/charts.r) shows the performance benchmark time taken in seconds (log scale) against the number of items (`n` as above) for nine kernels all executed on Chapel, D, and Julia for IEEE mathematics calculations. The chart below shows a repeated benchmark as above when using the fast math calculations in each language.
 <img src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/fmbenchplot.svg" width="800">
 
-In the IEEE mathematics case, Julia performs better than D and Chapel in all kernels, and in cases where fast math is used, the performance of Julia falls behind Chapel and D in all but the power benchmark. Both Chapel and D show very similar performance in all the performance benchmarks.
+In the IEEE mathematics case, Julia performs better than D and Chapel in all kernels, and in cases where fast math is used, the performance of Julia falls behind Chapel and D in all but the power kernel benchmark. Both Chapel and D show very similar performance in all the performance benchmarks.
 
-It is worth noting that the effect of using fast math violates IEEE standards, it breaks NaNs and infinity, and also violates associativity law due to rounding off errors. In most real world applications IEEE standard rather than fast math would be used. In addition the mathematics functions used in D were pulled from C's math module made available in the D compiler in its `core.stdc.math` module. This was done because the mathematical functions in D's standard library [`std.math`](https://dlang.org/phobos/std_math.html) can be slow. The math functions used are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d). By way of comparison consider the [mathdemo.d](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/mathdemo.d) script comparing the imported C `log` function D's log function from `std.math`:
+It is worth noting that the effect of using fast math violates IEEE standards, it breaks NaNs and infinity, and also violates associativity law due to rounding errors. In most real world applications IEEE standard rather than fast math would be used. In addition the mathematics functions used in D were pulled from C's math module made available in the D compiler in its [`core.stdc.math`](https://dlang.org/library/core/stdc/math.html) module. This was done because the mathematical functions in D's standard library [`std.math`](https://dlang.org/phobos/std_math.html) can be slow. The math functions used are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d). By way of comparison consider the [mathdemo.d](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/mathdemo.d) script comparing the imported C `log` function D's `log` function from `std.math`:
 
 ```bash
 $ ldc2 -O --boundscheck=off  --mcpu=native mathdemo.d && ./mathdemo
@@ -31,9 +31,9 @@ Time taken for c log: 0.58623 seconds.
 Time taken for d log: 2.3747 seconds.
 ```
 #### Suitability of Matrix object used
-The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed for this article, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times of the kernel matrix calculation between my implementation of a matrix and ndslice as a percentage of my matrix's kernel benchmark running time. Negative means that ndslice is slower and positive times mean that ndslice is faster. Across the timing are about the same and ndslice is broadly speaking slightly faster (apart from the Dot product benchmark), in the case of `log` and `power` kernel, ndslice's times are *much faster*, the difference is just over 40% across all data sizes, however this large difference however is due to the functions used rather than the implementation of the Matrix object, so the Matrix object used is a fair representation of D's performance.
+The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed for this article (explained later), but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times of the kernel matrix calculation between the implementation of Matrix and ndslice as a percentage of Matrix's kernel benchmark running time. Negative means that ndslice is slower and positive times mean that ndslice is faster. Performance across the timing are about the same and ndslice is broadly speaking slightly faster (apart from the Dot product benchmark). In the case of `log` and `power` kernel, ndslice's times are *much faster*, the difference is just over 40% across all data sizes, however this large difference however is due to the function used in the kernels rather than the implementation of the Matrix object itself, so the Matrix object used is a fair representation of D's performance.
 
-<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/ndsliceDiagnostic.jpg" width="800">
+<img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/ndsliceDiagnostic.svg" width="800">
 
 ## Environment
 
@@ -62,13 +62,13 @@ chpl version 1.22.0
 
 ### Compilation
 
-Compilation is done with scripts see the `script.sh` file in each language folder and the the `script.sh` script in the [home folder](https://github.com/dataPulverizer/KernelMatrixBenchmark) of the repository.
+Compilation is done with scripts see `script.sh` file in each language folder and the `script.sh` script in the [home folder](https://github.com/dataPulverizer/KernelMatrixBenchmark) of the repository.
 
 ## Implementations 
 
 Efforts were made to avoid non-standard libraries while implementing these kernel functions. The reasons for this are:
 
-* It's completely transparent and shows how each language works.
+* It is completely transparent and shows how each language works.
 * Packages outside standard libraries can go extinct so avoiding external libraries keeps the article and code relevant.
 * Making it easy for a reader after installing the language to copy and run the code. Having to install external libraries can be a bit of a "faff".
 
@@ -77,7 +77,6 @@ Efforts were made to avoid non-standard libraries while implementing these kerne
 Chapel uses a `forall` loop to parallelize over threads. Also C pointers to each item is used rather than the default array notation and `guided` iteration over indices are used:
 
 ```chpl
-//Chapel
 proc calculateKernelMatrix(K, data: [?D] ?T)
 {
   var n = D.dim(0).last;
@@ -129,7 +128,6 @@ The Julia code uses `@threads` macro for parallelising the code and `@views` mac
 The `Symmetric` type saves the small bit of extra work needed for allocating to both sides of the matrix.
 
 ```jl
-#Julia
 function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKernel,T <: AbstractFloat}
   n = size(data)[2]
   mat = zeros(T, n, n)
@@ -156,7 +154,7 @@ struct DotProduct <: AbstractKernel end
 end
 ```
 
-These optimizations are quite visible but very easy to apply.
+These optimizations are quite visible but easy to apply. Note that Julia has the `@fastmath` macro for applying fast math to individual code lines/blocks but only the command line option was used in this analysis.
 
 ## Memory Usage
 
