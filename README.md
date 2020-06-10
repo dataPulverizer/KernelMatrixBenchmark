@@ -1,7 +1,7 @@
 # A look at Chapel, D, and Julia using Kernel Matrix calculations
 
 *Author: Dr Chibisi Chima-Okereke*<br>
-*Date: 2020-06-04*
+*Date: 2020-06-10*
 
 ## Introduction
 
