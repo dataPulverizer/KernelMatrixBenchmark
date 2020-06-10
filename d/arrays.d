@@ -10,8 +10,11 @@ import std.traits: isFloatingPoint, isIntegral, isNumeric;
 import std.algorithm: min, max;
 import std.math: modf;
 import core.memory: GC;
+import core.stdc.stdlib: malloc, free;
 import std.stdio: writeln;
 import std.random;
+import std.parallelism;
+import std.range : iota;
 
 /********************************************* Printer Utility Functions *********************************************/
 auto getRange(T)(const(T[]) data)
@@ -46,6 +49,7 @@ string getFormat(real[] range, long maxLength = 8, long gap = 2)
 auto newArray(T)(long n)
 {
   auto data = (cast(T*)GC.malloc(T.sizeof*n, GC.BlkAttr.NO_SCAN))[0..n];
+  //auto data = new T[](n);
     if(data == null)
       assert(0, "Array Allocation Failed!");
   return data;
@@ -395,14 +399,21 @@ if(isFloatingPoint!T)
 
 // Create random matrix
 /****************************************************************************/
+auto createRNG()
+{
+  Mt19937_64 rng;
+  rng.seed(unpredictableSeed);
+  return rng;
+}
 Matrix!T createRandomMatrix(T)(ulong rows, ulong cols)
 {
-  Mt19937_64 gen;
-  gen.seed(unpredictableSeed);
+  //Mt19937_64 gen;
+  auto RNG = taskPool.workerLocalStorage(createRNG());
+  //gen.seed(unpredictableSeed);
   ulong len = rows*cols;
   T[] data = newArray!(T)(len);
-  for(int i = 0; i < len; ++i)
-    data[i] = uniform01!(T)(gen);
+  foreach(i; taskPool.parallel(iota(len)))
+    data[i] = uniform01!(T)(RNG.get);
   return Matrix!T(data, rows, cols);
 }
 Matrix!T createRandomMatrix(T)(ulong m)

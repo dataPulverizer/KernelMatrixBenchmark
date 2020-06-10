@@ -1,5 +1,5 @@
 import arrays;
-import kernelmatrix;
+import kernel;
 
 import std.conv: to;
 import std.meta: AliasSeq;
@@ -10,15 +10,15 @@ import std.datetime.stopwatch: AutoStart, StopWatch;
 
 /**
   To compile:
-  ldc2 script.d kernelmatrix.d math.d arrays.d -O --boundscheck=off --ffast-math -mcpu=native
+  ldc2 script.d kernel.d math.d arrays.d -O --boundscheck=off --ffast-math -mcpu=native
   /usr/bin/time -v ./script
   
   ldc2 --mcpu=help
-  ldc2 script.d kernelmatrix.d math.d arrays.d -O --boundscheck=off --ffast-math --mcpu=core-avx2 -mattr=+avx2,+sse4.1,+sse4.2
+  ldc2 script.d kernel.d math.d arrays.d -O --boundscheck=off --ffast-math --mcpu=core-avx2 -mattr=+avx2,+sse4.1,+sse4.2
   /usr/bin/time -v ./script
 */
 
-auto bench(alias K, T)(K!T kernel, long[] n, bool verbose = true)
+auto bench(alias K, T)(K!T kernel, long[] n)
 {
   auto times = new double[n.length];
   auto sw = StopWatch(AutoStart.no);
@@ -35,7 +35,7 @@ auto bench(alias K, T)(K!T kernel, long[] n, bool verbose = true)
       sw.reset();
     }
     times[i] = sum(_times[])/3.0;
-    if(verbose)
+    version(verbose)
     {
       writeln("Average time for n = ", n[i], ", ", times[i], " seconds.");
       writeln("Detailed times: ", _times, "\n");
@@ -44,19 +44,19 @@ auto bench(alias K, T)(K!T kernel, long[] n, bool verbose = true)
   return tuple(n, times);
 }
 
-auto runKernelBenchmark(KS)(KS kernels, long[] n, bool verbose = true)
+auto runKernelBenchmark(KS)(KS kernels, long[] n)
 {
-  auto tmp = bench(kernels[0], n, verbose);
+  auto tmp = bench(kernels[0], n);
   alias R = typeof(tmp);
   R[kernels.length] results;
   results[0] = tmp;
   static foreach(i; 1..kernels.length)
   {
-    if(verbose)
+    version(verbose)
     {
       writeln("Running benchmarks for ", kernels[i]);
     }
-    results[i] = bench(kernels[i], n, verbose);
+    results[i] = bench(kernels[i], n);
   }
   return results;
 }
@@ -71,9 +71,7 @@ void writeRow(File file, string[] row)
   return;
 }
 
-
-//bench: [0.009412, 0.271136, 1.43589, 11.267, 31.0559]
-void runAllKernelBenchmarks(T = float)(bool verbose = true)
+void runAllKernelBenchmarks(T = float)()
 {
   auto kernels = tuple(DotProduct!(T)(),   Gaussian!(T)(1), Polynomial!(T)(2.5f, 1),
                             Exponential!(T)(1), Log!(T)(3),      Cauchy!(T)(1),
@@ -83,7 +81,7 @@ void runAllKernelBenchmarks(T = float)(bool verbose = true)
                        "Power",       "Wave",     "Sigmoid"];
   //long[] n = [100L, 500L, 1000L];
   long[] n = [1000L, 5000L, 10_000L, 20_000L, 30_000L];
-  auto results = runKernelBenchmark(kernels, n, verbose);
+  auto results = runKernelBenchmark(kernels, n);
 
   auto table = new string[][] (n.length * kernels.length + 1, 4);
   table[0][] = ["language", "kernel", "nitems", "time"];
@@ -107,7 +105,12 @@ void runAllKernelBenchmarks(T = float)(bool verbose = true)
       break;
     }
   }
-  auto file = File("../data/dBench.csv", "w");
+  version(fastmath)
+  {
+    auto file = File("../fmdata/dBench.csv", "w");
+  }else{
+    auto file = File("../data/dBench.csv", "w");
+  }
   foreach(row; table)
     file.writeRow(row);
 }
