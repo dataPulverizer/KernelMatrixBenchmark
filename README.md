@@ -23,13 +23,13 @@ In the case for which fast math is not used, Julia performs better than D and Ch
 
 It is worth noting that the effect of using fast math is violating IEEE standards, the behaviour of NaNs and infinity, and also violating associativity law due to rounding off errors. Most of the time in real world applications fast-math would probably not be used. In addition the mathematics functions used in D were pulled from C's math module made available in the D compiler in its `core.stdc.math` module. This was done because the mathematical functions in D's standard library [`std.math`](https://dlang.org/phobos/std_math.html) can be quite slow. The math functions used are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d). By way of comparison consider the [mathdemo.d](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/mathdemo.d) script comparing the imported C `log` function D's log function from `std.math`:
 
-```
+```bash
 $ ldc2 -O --boundscheck=off --ffast-math --mcpu=native mathdemo.d && ./mathdemo
 Time taken for c log: 0.324789 seconds.
 Time taken for d log: 2.30737 seconds.
 ```
 
-The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times of the kernel matrix calculation between my implementation of a matrix and ndslice as a percentage of my matrix's kernel benchmark running time. Negative means that ndslice is slower and positive times mean that ndslice is faster. Across the board ndslice is broadly slightly faster but in the case of `log` and `power` kernel, ndslice's times are *much faster*, the difference is just over 40% across all data sizes and since those particular kernels consume the most amount of time ndslice benchmarks end up runing in about 1hr 37mins rather than 1hrs 54mins for Julia, 2hrs 28mins for D and 2 hrs 38 mins for Chapel.
+The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times of the kernel matrix calculation between my implementation of a matrix and ndslice as a percentage of my matrix's kernel benchmark running time. Negative means that ndslice is slower and positive times mean that ndslice is faster. Across the board ndslice is broadly slightly faster (apart from the Dot product benchmark) but in the case of `log` and `power` kernel, ndslice's times are *much faster*, the difference is just over 40% across all data sizes and since those particular kernels consume the most amount of time ndslice benchmarks end up runing in about 1hr 37mins rather than 1hrs 54mins for Julia, 2hrs 28mins for D and 2 hrs 38 mins for Chapel.
 
 <img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/ndsliceDiagnostic.jpg" width="800">
 
@@ -37,23 +37,23 @@ The Matrix object used in the D benchmark was implemented specifically because u
 
 The code was run on a computer with an Ubuntu 20.04 OS, 32 GB memory and an Intel® Core™ i9-8950HK CPU @ 2.90GHz with 6 cores and 12 threads.
 
-```
+```bash
 $ julia --version
 julia version 1.4.1
 ```
 
-```
+```bash
 $ dmd --version
 DMD64 D Compiler v2.090.1
 ```
 
-```
+```bash
 ldc2 --version
 LDC - the LLVM D compiler (1.18.0):
   based on DMD v2.088.1 and LLVM 9.0.0
 ```
 
-```
+```bash
 $ chpl --version
 chpl version 1.22.0
 ```
@@ -61,17 +61,17 @@ chpl version 1.22.0
 ### Compilation
 
 Chapel
-```
+```chpl
 chpl script.chpl kernelmatrix.chpl --fast && ./script
 ```
 
 D
-```
+```d
 ldc2 script.d kernelmatrix.d arrays.d -O5 --boundscheck=off --ffast-math -mcpu=native && ./script
 ```
 
 Julia - no compilation required but can be run from command line:
-```
+```jl
 julia script.jl
 ```
 
@@ -87,7 +87,7 @@ Efforts were made to avoid non-standard libraries while implementing these kerne
 
 Chapel uses a `forall` loop to parallelize over threads. Also C pointers to each item is used rather than the default array notation and `guided` iteration over indices are used:
 
-```
+```chpl
 //Chapel
 proc calculateKernelMatrix(K, data: [?D] ?T)
 {
@@ -114,7 +114,7 @@ Chapel code was the most difficult to optimise for performance and required the 
 
 D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the performance benefits came from the specific compiler used and flags selected (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
 
-```
+```d
 auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
 {
   long n = data.ncol;
@@ -139,7 +139,7 @@ The Julia code uses `@threads` macro for parallelising the code and `@views` mac
 
 The `Symmetric` type saves the small bit of extra work needed for allocating to both sides of the matrix.
 
-```
+```jl
 //Julia
 function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKernel,T <: AbstractFloat}
   n = size(data)[2]
@@ -155,7 +155,7 @@ end
 
 The `@bounds` and `@simd` macros in the kernel functions were used to turn bounds checking off and apply SIMD optimization to the calculations:
 
-```
+```jl
 struct DotProduct <: AbstractKernel end
 @inline function kernel(K::DotProduct, x::AbstractArray{T, N}, y::AbstractArray{T, N}) where {T,N}
   ret = zero(T)
