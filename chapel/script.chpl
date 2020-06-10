@@ -1,8 +1,12 @@
-use kernelmatrix;
+use kernel;
 
 use IO;
 use Time;
 use Random;
+
+config const fastmath: bool = false;
+config const verbose: bool = true;
+const folder = if fastmath then "fmdata" else "data";
 
 record BenchRecord {
   var D: domain(1);
@@ -16,7 +20,7 @@ record BenchRecord {
   }
 }
 
-proc bench(type T, Kernel, n: [?D] int(64), verbose: bool = true)
+proc bench(type T, Kernel, n: [?D] int(64))
 {
   var nitems: int(64) = D.dim(0).last: int(64);
   var times: [0..nitems] real(64);
@@ -46,7 +50,7 @@ proc bench(type T, Kernel, n: [?D] int(64), verbose: bool = true)
   return result;
 }
 
-proc runKernelBenchmarks(type T, kernels, n: [?D] int(64), verbose: bool = true)
+proc runKernelBenchmarks(type T, kernels, n: [?D] int(64))
 {
   var results: [0..#kernels.size] BenchRecord;
   for param i in 0..(kernels.size - 1) {
@@ -54,20 +58,20 @@ proc runKernelBenchmarks(type T, kernels, n: [?D] int(64), verbose: bool = true)
     if verbose {
       writeln("\n\nRunning benchmarks for ", kernel.type: string, kernel: string);
     }
-    results[i] = bench(T, kernel, n, verbose);
+    results[i] = bench(T, kernel, n);
   }
   return results;
 }
 
 /**
   To compile:
-  chpl script.chpl kernelmatrix.chpl --fast && ./script
-  bench: 0.040345 0.978326 3.85939 16.7087 40.2499
+  chpl script.chpl kernel.chpl --fast && ./script
 */
-proc runAllKernelBenchmarks(type T, verbose: bool = true)
+proc runAllKernelBenchmarks(type T, folder: string)
 {
   //var n = [100, 500, 1000];
   var n = [1000, 5000, 10000, 20000, 30000];
+  
   var kernels = (new DotProduct(T),        new Gaussian(T, 1: T), new Polynomial(T, 2.5: T, 1: T),
                  new Exponential(T, 1: T), new Log(T, 3: T),      new Cauchy(T, 1: T),
                  new Power(T, 2.5: T),     new Wave(T, 1: T),     new Sigmoid(T, 1: T, 1: T));
@@ -98,7 +102,7 @@ proc runAllKernelBenchmarks(type T, verbose: bool = true)
       break;
     }
   }
-  var file = open("../data/chapelBench.csv", iomode.cw);
+  var file = open("../" + folder + "/chapelBench.csv", iomode.cw);
   var _channel = file.writer();
   _channel.write(table);
   _channel.close();
@@ -108,5 +112,6 @@ proc runAllKernelBenchmarks(type T, verbose: bool = true)
 
 proc main()
 {
-  runAllKernelBenchmarks(real(32));
+  writeln("folder: ", folder);
+  runAllKernelBenchmarks(real(32), folder);
 }
