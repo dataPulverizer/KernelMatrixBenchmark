@@ -24,9 +24,9 @@ In the case for which fast math is not used, Julia performs better than D and Ch
 It is worth noting that the effect of using fast math is violating IEEE standards, the behaviour of NaNs and infinity, and also violating associativity law due to rounding off errors. Most of the time in real world applications fast math would probably not be used. In addition the mathematics functions used in D were pulled from C's math module made available in the D compiler in its `core.stdc.math` module. This was done because the mathematical functions in D's standard library [`std.math`](https://dlang.org/phobos/std_math.html) can be quite slow. The math functions used are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d). By way of comparison consider the [mathdemo.d](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/mathdemo.d) script comparing the imported C `log` function D's log function from `std.math`:
 
 ```bash
-$ ldc2 -O --boundscheck=off --ffast-math --mcpu=native mathdemo.d && ./mathdemo
-Time taken for c log: 0.324789 seconds.
-Time taken for d log: 2.30737 seconds.
+$ ldc2 -O --boundscheck=off  --mcpu=native mathdemo.d && ./mathdemo
+Time taken for c log: 0.58623 seconds.
+Time taken for d log: 2.3747 seconds.
 ```
 
 The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed, but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times of the kernel matrix calculation between my implementation of a matrix and ndslice as a percentage of my matrix's kernel benchmark running time. Negative means that ndslice is slower and positive times mean that ndslice is faster. Across the board ndslice is broadly slightly faster (apart from the Dot product benchmark) but in the case of `log` and `power` kernel, ndslice's times are *much faster*, the difference is just over 40% across all data sizes and since those particular kernels consume the most amount of time ndslice benchmarks end up runing in about 1hr 37mins rather than 1hrs 54mins for Julia, 2hrs 38mins for D and 2 hrs 39 mins for Chapel. This large difference however is due to the functions used rather than the implmentation of the Matrix object. 
