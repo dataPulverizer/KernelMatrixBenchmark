@@ -10,7 +10,7 @@
 	"description": "Kernel Matrix Calculations using D's Mir Algorithm Package",
 	"license": "MIT",
 	"name": "ndslice",
-	"dflags": ["--boundscheck=off", "--ffast-math", "-mcpu=native"],
+	"dflags": ["--boundscheck=off", "-mcpu=native"],
 	"toolchainRequirements": {
 		"dmd": ">=2.090.1",
 		"gdc": "no",
