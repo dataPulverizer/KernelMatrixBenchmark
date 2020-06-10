@@ -16,7 +16,7 @@ In terms of bias going in I was much more familiar with D and Julia than I was o
 ## Language Benchmarks for Kernel Matrix Calculation
 <img src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/benchplot.jpg" width="800">
 
-The above chart (generated using R's ggplot2 using a [script](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/images/charts.r)) shows the performance benchmark time taken on a log scale against the number of items `n` for Chapel, D Julia, for nine kernels. The chart below shows a repeated benchmark as above when using the fast math switch in each language.
+The [above chart](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/charts.r) shows the performance benchmark time taken on a log scale against the number of items `n` for Chapel, D Julia, for nine kernels. The chart below shows a repeated benchmark as above when using the fast math switch in each language.
 <img src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/fmbenchplot.jpg" width="800">
 
 In the case for which fast math is not used, Julia performs better than D and Chapel in all cases, and in cases where fastmath is used, the performance of Julia falls behind Chapel and D in all but the power benchmark. Both Chapel and D show very similar performance in all the performance benchmarks.
