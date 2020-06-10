@@ -2,7 +2,10 @@ include("KernelMatrix.jl")
 using DelimitedFiles: writedlm;
 using InteractiveUtils: @code_warntype;
 
-function bench(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = true) where {T}
+const folder, _verbose = ARGS
+const verbose = _verbose == "true" ? true : false;
+
+function bench(Kernel::AbstractKernel{T}, n::Array{Int64, 1}) where {T}
   times::Array{Float64, 1} = zeros(Float64, length(n))
   for i in 1:length(n)
     _times::Array{Float64, 1} = zeros(Float64, 3)
@@ -22,7 +25,7 @@ function bench(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = tr
   return times
 end
 
-function precompileKernel(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose::Bool = true) where {T}
+function precompileKernel(Kernel::AbstractKernel{T}, n::Array{Int64, 1}) where {T}
   precompile(kernel, (typeof(Kernel), Array{T, 1}, Array{T, 1}))
   precompile(calculateKernelMatrix, (typeof(Kernel), Array{T, 2}))
   precompile(bench, (typeof(Kernel), Array{Int64, 1}))
@@ -31,31 +34,31 @@ function precompileKernel(Kernel::AbstractKernel{T}, n::Array{Int64, 1}, verbose
   if verbose
     println("\n\nBenchmark for kernel: ", repr(Kernel), "\ntimes: ", times)
   end
-
+  
   return (n, times)
 end
 
-function runKernelBenchmarks(kernels::NTuple{N, AbstractKernel{T}}, n::Array{Int64, 1}, verbose::Bool = true) where {N, T}
+function runKernelBenchmarks(kernels::NTuple{N, AbstractKernel{T}}, n::Array{Int64, 1}) where {N, T}
   results = Array{Tuple{Array{Int64, 1}, Array{Float64, 1}}, 1}(undef, length(kernels))
   for i in 1:length(results)
     if verbose # to check types are known at compilation
-      @code_warntype precompileKernel(kernels[i], n, verbose)
+      @code_warntype precompileKernel(kernels[i], n)
     end
-    results[i] = precompileKernel(kernels[i], n, verbose)
+    results[i] = precompileKernel(kernels[i], n)
   end
   return results
 end
 
-function main(::Type{T}, verbose::Bool = true) where {T}
+function main(::Type{T}) where {T}
+  # n = [100, 500, 1000]
   n = [1000, 5000 , 10_000, 20_000, 30_000];
-  
   kernels = (DotProduct{T}(),   Gaussian{T}(1), Polynomial{T}(2.5, 1),
              Exponential{T}(1), Log{T}(3),      Cauchy{T}(1),
              Power{T}(2.5),     Wave{T}(1),     Sigmoid{T}(1, 1));
   kernelNames = ["DotProduct",  "Gaussian", "Polynomial",
                  "Exponential", "Log",      "Cauchy",
                  "Power",       "Wave",     "Sigmoid"];
-  outputs = runKernelBenchmarks(kernels, n, verbose)
+  outputs = runKernelBenchmarks(kernels, n)
   
   table = Array{String, 2}(undef, (length(n)*length(kernels) + 1, 4))
   table[1, :] = ["language", "kernel", "nitems", "time"]
@@ -75,7 +78,7 @@ function main(::Type{T}, verbose::Bool = true) where {T}
     end
   end
   
-  writedlm("../data/juliaBench.csv", table, ',')
+  writedlm("../" * folder * "/juliaBench.csv", table, ',')
   
   return
 end

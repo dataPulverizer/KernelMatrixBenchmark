@@ -1,24 +1,25 @@
-	Command being timed: "julia script.jl"
-	User time (seconds): 49794.85
-	System time (seconds): 30.58
-	Percent of CPU this job got: 726%
+	Command being timed: "julia script.jl data true"
+	User time (seconds): 49163.19
+	System time (seconds): 32.08
+	Percent of CPU this job got: 717%
 	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:54:18
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 7496184
+	Maximum resident set size (kbytes): 7501592
 	Average resident set size (kbytes): 0
-	Major (requiring I/O) page faults: 794
-	Minor (reclaiming a frame) page faults: 38019472
-	Voluntary context switches: 2629
-	Involuntary context switches: 523063
+	Major (requiring I/O) page faults: 804
+	Minor (reclaiming a frame) page faults: 38021184
+	Voluntary context switches: 2657
+	Involuntary context switches: 477363
 	Swaps: 0
-	File system inputs: 368360
+	File system inputs: 368240
 	File system outputs: 8
 	Socket messages sent: 0
 	Socket messages received: 0
 	Signals delivered: 0
 	Page size (bytes): 4096
 	Exit status: 0
+
 
