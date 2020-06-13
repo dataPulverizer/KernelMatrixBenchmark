@@ -1,9 +1,17 @@
 import arrays;
-import math;
+//import math;
 import std.parallelism;
 import std.range : iota;
 import std.stdio: writeln;
 import std.datetime.stopwatch: AutoStart, StopWatch;
+
+import core.stdc.math: exp,   exp  = expf,   exp = expl,
+                       fabs,  fabs = fabsf,  fabs = fabsl,
+                       log,   log  = logf,   log  = logl, 
+                       pow,   pow  = powf,   pow  = powl,
+                       sin,   sin  = sinf,   sin  = sinhl,
+                       sqrt,  sqrt = sqrtf,  sqrt = sqrtl,
+                       tanh,  tanh = tanhf,  tanh = tanhl;
 
 /**
   Kernel Function Types:
@@ -85,7 +93,7 @@ struct Exponential(T)
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist -= abs(x[i] - y[i]);
+        dist -= fabs(x[i] - y[i]);
       }
       return exp(dist/theta);
     }
@@ -106,7 +114,7 @@ struct Log(T)
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist += pow(abs(x[i] - y[i]), beta);
+        dist += pow(fabs(x[i] - y[i]), beta);
       }
       dist = pow(dist, 1/beta);
       return -log(1 + dist);
@@ -151,7 +159,7 @@ struct Power(T)
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist += pow(abs(x[i] - y[i]), beta);
+        dist += pow(fabs(x[i] - y[i]), beta);
       }
       return -pow(dist, 1/beta);
     }
@@ -172,7 +180,7 @@ struct Wave(T)
       auto m = x.length;
       for(size_t i = 0; i < m; ++i)
       {
-        dist += abs(x[i] - y[i]);
+        dist += fabs(x[i] - y[i]);
       }
       auto tmp = theta/dist;
       return tmp*sin(1/tmp);

@@ -81,6 +81,7 @@ void runAllKernelBenchmarks(T = float)()
                        "Power",       "Wave",     "Sigmoid"];
   //long[] n = [100L, 500L, 1000L];
   long[] n = [1000L, 5000L, 10_000L, 20_000L, 30_000L];
+  
   auto results = runKernelBenchmark(kernels, n);
 
   auto table = new string[][] (n.length * kernels.length + 1, 4);
