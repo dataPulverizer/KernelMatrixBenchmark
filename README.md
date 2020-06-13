@@ -21,9 +21,9 @@ In terms of bias, going in I was much more familiar with D and Julia than I was 
 The [above chart](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/charts.r) shows the performance benchmark time taken in seconds (log scale) against the number of items (`n` as above) for nine kernels all executed on Chapel, D, and Julia for IEEE mathematics calculations. The chart below shows a repeated benchmark as above when using the fast math calculations in each language.
 <img src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/fmbenchplot.svg" width="800">
 
-In the IEEE floating point case, Julia performs better than D and Chapel in all kernels, and in cases where fast math is used, the performance of Julia falls behind Chapel and D in all but the power kernel benchmark. Both Chapel and D show very similar performance in all performance benchmarks.
+In the IEEE floating point case, Julia performs better than D and Chapel in all but the `log` and `power` kernels where D is performs better, and in cases where fast math is used, the performance of Julia falls behind Chapel and D in all but the power kernel benchmark where D performs better. Both Chapel and D show very similar performance in all but the `log` and `power` benchmarks.
 
-In addition the mathematics functions used in D were pulled from C's math module made available in the D compiler in its [`core.stdc.math`](https://dlang.org/library/core/stdc/math.html) module. This was done because the mathematical functions in D's standard library [`std.math`](https://dlang.org/phobos/std_math.html) can be slow. The math functions used are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d). By way of comparison consider the [mathdemo.d](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/mathdemo.d) script comparing the imported C `log` function D's `log` function from `std.math`:
+In the interest of transparency, the mathematics functions used in D were pulled from C's math module made available in the D compiler in its [`core.stdc.math`](https://dlang.org/library/core/stdc/math.html) module. This was done because the mathematical functions in D's standard library [`std.math`](https://dlang.org/phobos/std_math.html) can be slow. The math functions used are given [here](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/math.d). By way of comparison consider the [mathdemo.d](https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/d/mathdemo.d) script comparing the imported C `log` function D's `log` function from `std.math`:
 
 ```bash
 $ ldc2 -O --boundscheck=off  --mcpu=native mathdemo.d && ./mathdemo
@@ -31,7 +31,7 @@ Time taken for c log: 0.58623 seconds.
 Time taken for d log: 2.3747 seconds.
 ```
 #### Suitability of Matrix object used
-The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed for this article (explained later), but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times of the kernel matrix calculation between the implementation of Matrix and ndslice as a percentage of Matrix's kernel benchmark running time. Negative means that ndslice is slower and positive times mean that ndslice is faster. Performance across the timing are about the same and ndslice is broadly speaking slightly faster (apart from the Dot product benchmark). In the case of `log` and `power` kernel, ndslice's times are *much faster*, the difference is just over 40% across all data sizes, however this large difference however is due to the function used in the kernels rather than the implementation of the Matrix object itself, so the Matrix object used is a fair representation of D's performance.
+The Matrix object used in the D benchmark was implemented specifically because use of modules outside language standard libraries was disallowed for this article (discussed later), but to make sure that this implementation is competitive i.e. does not unfairly represent D's performance, it is compared to Mir's ndslice library written in D. The chart below shows the difference in execution times of the kernel matrix calculation between the implementation of Matrix and ndslice as a percentage of Matrix's kernel benchmark running time. Negative means that ndslice is slower and positive times mean that ndslice is faster. Performance across the kernels are all about the same, sometimes ndslice is slightly faster and at other times it is slightly slower, so the Matrix object used is a fair representation of D's performance.
 
 <img class="plot" src="https://github.com/dataPulverizer/KernelMatrixBenchmark/blob/master/charts/ndsliceDiagnostic.svg" width="800">
 
@@ -160,7 +160,7 @@ These optimizations are quite visible but easy to apply. Note that Julia has the
 
 The total time for each benchmark and memory used was captured using the `/usr/bin/time -v` command. The output for each of the languages is given below:
 
-The complete calculation in Chapel took about the same amount of time as D to execute but consumed less memory (nearly 9GB RAM peak memory):
+The complete calculation in Chapel took about the longest amount of time to execute but consumed a moderate amount of memory (nearly 9GB RAM peak memory):
 ```
 	Command being timed: "./script --verbose=true --fastmath=false"
 	User time (seconds): 114342.55
@@ -187,24 +187,24 @@ The complete calculation in Chapel took about the same amount of time as D to ex
 	Exit status: 0
 ```
 
-D consumed the most amount of memory (around 20GB RAM peak memory) and took about the same total time as Chapel to execute:
+D consumed the most amount of memory (around 20GB RAM peak memory) but took the least amount of time to execute:
 
 ```
 	Command being timed: "./script"
-	User time (seconds): 112787.04
-	System time (seconds): 47.36
-	Percent of CPU this job got: 1187%
-	Elapsed (wall clock) time (h:mm:ss or m:ss): 2:38:20
+	User time (seconds): 69089.75
+	System time (seconds): 41.91
+	Percent of CPU this job got: 1181%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 1:37:29
 	Average shared text size (kbytes): 0
 	Average unshared data size (kbytes): 0
 	Average stack size (kbytes): 0
 	Average total size (kbytes): 0
-	Maximum resident set size (kbytes): 20849980
+	Maximum resident set size (kbytes): 20458972
 	Average resident set size (kbytes): 0
 	Major (requiring I/O) page faults: 0
-	Minor (reclaiming a frame) page faults: 18100437
-	Voluntary context switches: 4876
-	Involuntary context switches: 2741842
+	Minor (reclaiming a frame) page faults: 15393443
+	Voluntary context switches: 4884
+	Involuntary context switches: 2222841
 	Swaps: 0
 	File system inputs: 8
 	File system outputs: 8
@@ -215,7 +215,7 @@ D consumed the most amount of memory (around 20GB RAM peak memory) and took abou
 	Exit status: 0
 ```
 
-Julia consumed the least of memory (around 7.5 GB peak memory) and ran the quickest - mainly because the functions used in it's log and power kernels were more efficient those used in D and Chapel:
+Julia consumed the least of memory (around 7.5 GB peak memory) and ran the second fastest in total:
 
 ```
 	Command being timed: "julia script.jl data true"
@@ -348,4 +348,4 @@ Table for quality of life features in Chapel, D & Julia
 
 If you are a novice programmer writing numerical algorithms and doing calculations based in scientific computing and want a fast language that's easy to use Julia is your best bet. If you are an experienced programmer working in the same space Julia is still a great option. If you specifically want a more conventional "industrial strength" static compiled high performance language with all the "bells and whistles" but want something more productive, safer and less painful than C++ then D is your best bet. You can write "anything" in D and get great performance from its compilers. If you need to run array calculations on large clusters while avoiding the pain of writing MPI C++ code then Chapel is probably best place to go.
 
-In terms of raw performance on this task Julia is the winner clearly performing better in all 9 kernels benchmarked for using IEEE math, however for applications that use fast math D and Chapel largely provide better performance. This exercise reveals that Julia's label as a high performance language is more than just hype, it has held it's own against highly competitve languages. Chapel and D's performance were very similar to each other in both the IEEE and fast math modes of calculation
+In terms of raw performance on this task for IEEE math Julia is the winner performing better in 7 of the 9 kernels. For applications that use fast math D and Chapel performed better than Julia  in 7 of the 9 kernels, D performed test in the other 2 kernels (`log` and `power`) than Julia and Chapel in IEEE and fastmath mode. This exercise reveals that Julia's label as a high performance language is more than just hype, it has held it's own against highly competitive languages. Chapel and D's performance were very similar to each other in both the IEEE and fast math modes of calculation.
