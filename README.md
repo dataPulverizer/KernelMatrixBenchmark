@@ -68,9 +68,10 @@ Compilation is done with scripts see `script.sh` file in each language folder an
 
 Efforts were made to avoid non-standard libraries while implementing these kernel functions. The reasons for this are:
 
-* It is completely transparent and shows how each language works.
+* It is completely transparent and shows how each language works. This article is about the programming languages and what the reader can expect in terms of performance and other factors discussed later. Packages can sometimes give a false impression about what using a programming language is like.
 * Packages outside standard libraries can go extinct so avoiding external libraries keeps the article and code relevant.
 * Making it easy for a reader after installing the language to copy and run the code. Having to install external libraries can be a bit of a "faff".
+
 
 ### Chapel
 
