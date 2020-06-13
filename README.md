@@ -97,7 +97,7 @@ proc calculateKernelMatrix(K, data: [?D] ?T)
 }
 ```
 
-Chapel code was the most difficult to optimise for performance and required the most in terms of code changes.
+Chapel array objects for rows and columns of 2D arrays are usually indexed quite differently from the code above, not using pointers but more user-friendly notation, it it presented in this way to get the best performance.
 
 ### D
 
