@@ -1,5 +1,4 @@
 import arrays;
-//import math;
 import std.parallelism;
 import std.range : iota;
 import std.stdio: writeln;
