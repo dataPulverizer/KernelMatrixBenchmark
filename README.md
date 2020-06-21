@@ -76,7 +76,7 @@ Efforts were made to avoid non-standard libraries while implementing these kerne
 
 ### Chapel
 
-Chapel uses a `forall` loop to parallelize over threads. Also C pointers to each item is used rather than the default array notation and `guided` iteration over indices are used:
+Chapel uses a `forall` loop to parallelize over threads and uses `guided` iteration over indices are used. Array rows and columns are usually indexed in a user friendly manner, but above they are accessed using pointers which can be a way of boosting performance.
 
 ```chpl
 proc calculateKernelMatrix(K, data: [?D] ?T)
@@ -98,11 +98,9 @@ proc calculateKernelMatrix(K, data: [?D] ?T)
 }
 ```
 
-Chapel array objects for rows and columns of 2D arrays are usually indexed quite differently from the code above, not using pointers but more user-friendly notation, it it presented in this way to get the best performance.
-
 ### D
 
-D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the performance benefits came from the specific compiler used and flags selected (discussed later). My implementation of a `Matrix` allows columns to be selected by reference `refColumnSelect`.
+D uses a `taskPool` of threads from its `std.parallel` package to parallelize code. The D code underwent the least amount of change for performance optimization, a lot of the performance benefits came from the specific compiler used and flags selected (discussed later). The implementation of `Matrix` allows columns to be selected by reference `refColumnSelect`.
 
 ```d
 auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
@@ -127,7 +125,7 @@ auto calculateKernelMatrix(alias K, T)(K!(T) kernel, Matrix!(T) data)
 
 The Julia code uses `@threads` macro for parallelising the code and `@views` macro for referencing arrays. One confusing thing about Julia's arrays is their reference status. Sometimes as in this case arrays will behave like value objects and they have to be referenced by using the `@views` macro otherwise they generate copies, at other times they behave like reference objects, for example passing them into a function. It can be a little tricky dealing with this because it's not always obvious which set of operations will generate a copy, but where this occurs `@views` provides a good solution.
 
-The `Symmetric` type saves the small bit of extra work needed for allocating to both sides of the matrix.
+Julia also has `Symmetric` matrix type which meaning allocating to both sides of the matrix is not necessary.
 
 ```jl
 function calculateKernelMatrix(Kernel::K, data::Array{T}) where {K <: AbstractKernel,T <: AbstractFloat}
